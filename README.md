@@ -18,6 +18,46 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 2. Install dependencies with `npm i`
 3. Run unit test watcher with `npm run test:dev`
 
+## ⚙️ Tool Settings
+
+> Settings are used to configure the tool in a Component Manager config file
+
+### Hide Originating IP Address `boolean`
+
+`hideOriginalIP` will prevent sending the visitor IP address to Google Analytics 4
+
+### E-commerce tracking `boolean`
+
+`ecommerce` Enable forwarding of Zaraz E-commerce API events to Google Analytics as part of the enhanced e-commerce tracking feature. [Learn more](https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce#ecommerce-tracking)
+
+### Google Analytics Audiences `boolean`
+
+`ga-audiences` enables/disables Audiences collection through Google Analytics
+
+### Cookie Base Domain `string` _required_
+
+`baseDomain` manually set the domain for all Google Analytics cookies
+
+## 🧱 Fields Description
+
+> Fields are properties that can/must be sent with certain events
+
+### Measurement ID `string` _required_
+
+`tid` is the unique identifier of your Google Analytics 4 account. [Learn more](https://www.semrush.com/blog/google-analytics-tracking-id/#how-to-find-google-analytics-tracking-id)
+
+### User ID/Visitor ID `string`
+
+`uid` lets you associate your own identifiers with individual users so you can connect their behavior across different sessions and on various devices and platforms. [Learn more](https://developers.google.com/analytics/devguides/collection/ga4/user-id?technology=gtagjs)
+
+### Event Name `string`
+
+`en` will be sent as Event Name to Google Analytics. [Learn more](https://support.google.com/analytics/answer/1033068?hl=en)
+
+### Non-interaction `boolean`
+
+`ni` events are not taken into account when Google Analytics calculates bounces and session duration. [Learn more](https://support.google.com/analytics/answer/1033068?hl=en#NonInteractionEvents)
+
 ## 📝 License
 
 Licensed under the [Apache License](./LICENSE).
