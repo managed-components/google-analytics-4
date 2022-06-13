@@ -1,5 +1,5 @@
 {
-  "name": "@managed-components/mc-dynamite",
+  "name": "@managed-components/google-analytics-4",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -15,19 +15,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/managed-components/mc-dynamite.git"
+    "url": "git+https://github.com/managed-components/google-analytics-4.git"
   },
   "keywords": [
     "webcm",
     "managed-components",
-    "mc-dynamite"
+    "google-analytics-4"
   ],
   "author": "Cloudflare Managed Components Team <managedcomponents@cloudflare.com> (https://blog.cloudflare.com/zaraz-open-source-managed-components-and-webcm/)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/managed-components/mc-dynamite/issues"
+    "url": "https://github.com/managed-components/google-analytics-4/issues"
   },
-  "homepage": "https://github.com/managed-components/mc-dynamite#readme",
+  "homepage": "https://github.com/managed-components/google-analytics-4#readme",
   "devDependencies": {
     "@managed-components/types": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^5.27.0",

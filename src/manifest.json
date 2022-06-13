@@ -1,10 +1,21 @@
 {
-  "name": "MC Dynamite",
-  "description": "Totally hawt Managed Component 🔥🔥🔥",
-  "namespace": "mc-dynamite",
-  "icon": "assets/mc-dynamite.svg",
-  "categories": [],
+  "name": "Google Analytics 4",
+  "description": "Google Analytics 4 Managed Component",
+  "namespace": "google-analytics-4",
+  "icon": "assets/google-analytics-4.svg",
+  "categories": ["Analytics"],
   "provides": ["events"],
   "allowCustomFields": true,
-  "permissions": []
+  "permissions": [
+    {
+      "permission": "clientFetch",
+      "explanation": "Google Analytics uses client fetch to attribute sessions more accurately",
+      "required": false
+    },
+    {
+      "permission": "run_client_js",
+      "explanation": "If you're using GA Audiences",
+      "required": true
+    }
+  ]
 }
