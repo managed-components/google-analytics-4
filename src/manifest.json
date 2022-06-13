@@ -1,0 +1,10 @@
+{
+  "name": "MC Dynamite",
+  "description": "Totally hawt Managed Component 🔥🔥🔥",
+  "namespace": "mc-dynamite",
+  "icon": "assets/mc-dynamite.svg",
+  "categories": [],
+  "provides": ["events"],
+  "allowCustomFields": true,
+  "permissions": []
+}
