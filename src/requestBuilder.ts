@@ -1,12 +1,13 @@
-import { flattenKeys, isNumber } from './utils'
 import { ComponentSettings, MCEvent } from '@managed-components/types'
-
+import crypto from 'crypto'
 import {
+  buildProductRequest,
   EVENTS,
   mapProductToItem,
   PREFIX_PARAMS_MAPPING,
-  buildProductRequest,
 } from './ecommerce'
+import { flattenKeys, isNumber } from './utils'
+
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
 const getToolRequest = (event: MCEvent, settings: ComponentSettings) => {
