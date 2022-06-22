@@ -28,7 +28,7 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 
 ### E-commerce tracking `boolean`
 
-`ecommerce` Enable forwarding of Zaraz E-commerce API events to Google Analytics as part of the enhanced e-commerce tracking feature. [Learn more](https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce#ecommerce-tracking)
+`ecommerce` Enable forwarding E-commerce events to Google Analytics as part of the enhanced e-commerce tracking feature. [Learn more](https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce#ecommerce-tracking)
 
 ### Google Analytics Audiences `boolean`
 
