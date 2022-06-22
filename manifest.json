@@ -6,16 +6,14 @@
   "categories": ["Analytics"],
   "provides": ["events"],
   "allowCustomFields": true,
-  "permissions": [
-    {
-      "permission": "clientFetch",
-      "explanation": "Google Analytics uses client fetch to attribute sessions more accurately",
+  "permissions": {
+    "client_network_requests": {
+      "description": "Google Analytics uses client fetch to attribute sessions more accurately",
       "required": false
     },
-    {
-      "permission": "run_client_js",
-      "explanation": "If you're using GA Audiences",
+    "execute_unsafe_scripts": {
+      "description": "If you're using GA Audiences",
       "required": true
     }
-  ]
+  }
 }
