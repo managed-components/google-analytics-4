@@ -56,6 +56,12 @@ const getToolRequest = (event: MCEvent, settings: ComponentSettings) => {
     })
   }
 
+  if (parseInt(requestBody['_s'] as string) > 1) {
+    const msSinceLastEvent = Date.now() - parseInt(client.get('_let')) // _let = "_lastEventTime"
+    requestBody._et = msSinceLastEvent
+  }
+  client.set('_let', Date.now().toString())
+
   /* Start of gclid treating */
   if (client.url.searchParams?.get('_gl')) {
     try {
