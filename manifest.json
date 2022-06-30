@@ -13,7 +13,7 @@
     },
     "execute_unsafe_scripts": {
       "description": "If you're using GA Audiences",
-      "required": true
+      "required": false
     },
     "access_client_kv": {
       "description": "",
