@@ -1,5 +1,4 @@
 import { ComponentSettings, MCEvent } from '@managed-components/types'
-import crypto from 'crypto'
 import {
   buildProductRequest,
   EVENTS,
@@ -10,8 +9,21 @@ import { flattenKeys, isNumber } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
-const getToolRequest = (event: MCEvent, settings: ComponentSettings) => {
-  const { client, payload } = event
+const getToolRequest = (
+  event: MCEvent,
+  settings: ComponentSettings,
+  ecommerce: boolean = false
+) => {
+  let payload = {}
+
+  // avoid sending ecommerce flattened products list to GA4
+  const { client, payload: fullPayload } = event
+  if (ecommerce) {
+    const { products, ...restOfPayload } = fullPayload
+    payload = restOfPayload
+  } else {
+    payload = fullPayload
+  }
   client.get('counter')
     ? client.set('counter', (parseInt(client.get('counter')) + 1).toString())
     : client.set('counter', '1')
@@ -125,10 +137,13 @@ const getFinalURL = (
   ecommerce = false
 ) => {
   const { payload } = event
-  const toolRequest = getToolRequest(event, settings)
+  const { products, ...restOfPayload } = payload
+  const toolRequest = getToolRequest(event, settings, ecommerce)
+  toolRequest['ep.debug_mode'] = true
 
   // ecommerce events
   if (ecommerce === true) {
+    console.log('In get final URL GA4 ::: ecommerce is true')
     let prQueryParams
 
     // event name and currency will always be added as non prefixed query params

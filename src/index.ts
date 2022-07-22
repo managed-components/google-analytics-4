@@ -2,15 +2,17 @@ import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
 
 export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.addEventListener('event', event => sendEvent(event, settings))
+  manager.addEventListener('event', event => {
+    sendEvent(event, settings)
+  })
 
   manager.addEventListener('pageview', event => {
     sendEvent(event, settings)
   })
 
-  manager.addEventListener('ecommerce', async event =>
+  manager.addEventListener('ecommerce', async event => {
     sendEvent(event, settings, true)
-  )
+  })
 }
 
 const sendEvent = async (
