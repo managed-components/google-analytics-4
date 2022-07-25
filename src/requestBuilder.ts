@@ -143,7 +143,6 @@ const getFinalURL = (
 
   // ecommerce events
   if (ecommerce === true) {
-    console.log('In get final URL GA4 ::: ecommerce is true')
     let prQueryParams
 
     // event name and currency will always be added as non prefixed query params
