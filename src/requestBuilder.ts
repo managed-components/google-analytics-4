@@ -1,4 +1,5 @@
 import { ComponentSettings, MCEvent } from '@managed-components/types'
+import crypto from 'crypto'
 import {
   buildProductRequest,
   EVENTS,
