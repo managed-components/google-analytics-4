@@ -138,9 +138,9 @@ const getFinalURL = (
   ecommerce = false
 ) => {
   const { payload } = event
-  const { products, ...restOfPayload } = payload
   const toolRequest = getToolRequest(event, settings, ecommerce)
-  toolRequest['ep.debug_mode'] = true
+
+  // toolRequest['ep.debug_mode'] = true
 
   // ecommerce events
   if (ecommerce === true) {
