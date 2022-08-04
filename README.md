@@ -22,6 +22,10 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 
 > Settings are used to configure the tool in a Component Manager config file
 
+### Measurement ID `string` _required_
+
+`tid` is the unique identifier of your Google Analytics 4 account. [Learn more](https://www.semrush.com/blog/google-analytics-tracking-id/#how-to-find-google-analytics-tracking-id)
+
 ### Hide Originating IP Address `boolean`
 
 `hideOriginalIP` will prevent sending the visitor IP address to Google Analytics 4
@@ -41,10 +45,6 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 ## 🧱 Fields Description
 
 > Fields are properties that can/must be sent with certain events
-
-### Measurement ID `string` _required_
-
-`tid` is the unique identifier of your Google Analytics 4 account. [Learn more](https://www.semrush.com/blog/google-analytics-tracking-id/#how-to-find-google-analytics-tracking-id)
 
 ### User ID/Visitor ID `string`
 
