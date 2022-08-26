@@ -119,15 +119,17 @@ const getToolRequest = (event: MCEvent, settings: ComponentSettings) => {
 }
 
 const getFinalURL = (
+  eventType: string,
   event: MCEvent,
-  settings: ComponentSettings,
-  ecommerce = false
+  settings: ComponentSettings
 ) => {
   const { payload } = event
   const toolRequest = getToolRequest(event, settings)
 
+  toolRequest.en = eventType
+
   // ecommerce events
-  if (ecommerce === true) {
+  if (eventType === 'ecommerce') {
     let prQueryParams
 
     // event name and currency will always be added as non prefixed query params

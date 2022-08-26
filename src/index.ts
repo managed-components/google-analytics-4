@@ -2,24 +2,26 @@ import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
 
 export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.addEventListener('event', event => sendEvent(event, settings))
+  manager.addEventListener('event', event =>
+    sendEvent('event', event, settings)
+  )
 
   manager.addEventListener('pageview', event => {
-    sendEvent(event, settings)
+    sendEvent('page_view', event, settings)
   })
 
   manager.addEventListener('ecommerce', async event =>
-    sendEvent(event, settings, true)
+    sendEvent('ecommerce', event, settings)
   )
 }
 
 const sendEvent = async (
+  eventType: string,
   event: MCEvent,
-  settings: ComponentSettings,
-  ecommerce = false
+  settings: ComponentSettings
 ) => {
   const { client } = event
-  const { finalURL, requestBody } = getFinalURL(event, settings, ecommerce)
+  const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
   fetch(finalURL, {
     headers: { 'User-Agent': client.userAgent },
   })
