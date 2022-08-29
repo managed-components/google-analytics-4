@@ -19,6 +19,7 @@ const getToolRequest = (event: MCEvent, settings: ComponentSettings) => {
     gtm: '2oe5j0', // gtm version hash
     tid: settings.tid,
     dl: client.url.href,
+    ul: client.language,
     dt: client.title,
     _p: getRandomInt(),
     _s: client.get('counter'),
