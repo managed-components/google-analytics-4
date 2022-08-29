@@ -18,6 +18,10 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 2. Install dependencies with `npm i`
 3. Run unit test watcher with `npm run test:dev`
 
+## Supported Event Types
+
+`pageview`, `ecommerce`, `event`
+
 ## ⚙️ Tool Settings
 
 > Settings are used to configure the tool in a Component Manager config file
