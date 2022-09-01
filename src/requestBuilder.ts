@@ -9,8 +9,21 @@ import { flattenKeys, isNumber } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
-const getToolRequest = (event: MCEvent, settings: ComponentSettings) => {
-  const { client, payload } = event
+const getToolRequest = (
+  event: MCEvent,
+  settings: ComponentSettings,
+  ecommerce: boolean = false
+) => {
+  let payload = {}
+
+  // avoid sending ecommerce flattened products list to GA4
+  const { client, payload: fullPayload } = event
+  if (ecommerce) {
+    const { products, ...restOfPayload } = fullPayload
+    payload = restOfPayload
+  } else {
+    payload = fullPayload
+  }
   client.get('counter')
     ? client.set('counter', (parseInt(client.get('counter')) + 1).toString())
     : client.set('counter', '1')
@@ -125,7 +138,9 @@ const getFinalURL = (
   settings: ComponentSettings
 ) => {
   const { payload } = event
-  const toolRequest = getToolRequest(event, settings)
+  const toolRequest = getToolRequest(event, settings, ecommerce)
+
+  // toolRequest['ep.debug_mode'] = true
 
   toolRequest.en = eventType
 
