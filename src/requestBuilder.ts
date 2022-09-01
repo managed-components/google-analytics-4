@@ -142,8 +142,6 @@ const getFinalURL = (
 
   // toolRequest['ep.debug_mode'] = true
 
-  toolRequest.en = eventType
-
   // ecommerce events
   if (eventType === 'ecommerce') {
     let prQueryParams
