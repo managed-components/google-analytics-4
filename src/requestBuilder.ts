@@ -32,6 +32,7 @@ const getToolRequest = (
     gtm: '2oe5j0', // gtm version hash
     tid: settings.tid,
     dl: client.url.href,
+    ul: client.language,
     dt: client.title,
     _p: getRandomInt(),
     _s: client.get('counter'),
@@ -132,17 +133,19 @@ const getToolRequest = (
 }
 
 const getFinalURL = (
+  eventType: string,
   event: MCEvent,
-  settings: ComponentSettings,
-  ecommerce = false
+  settings: ComponentSettings
 ) => {
   const { payload } = event
   const toolRequest = getToolRequest(event, settings, ecommerce)
 
   // toolRequest['ep.debug_mode'] = true
 
+  toolRequest.en = eventType
+
   // ecommerce events
-  if (ecommerce === true) {
+  if (eventType === 'ecommerce') {
     let prQueryParams
 
     // event name and currency will always be added as non prefixed query params
