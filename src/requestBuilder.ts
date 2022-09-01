@@ -10,16 +10,16 @@ import { flattenKeys, isNumber } from './utils'
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
 const getToolRequest = (
+  eventType: string,
   event: MCEvent,
-  settings: ComponentSettings,
-  ecommerce: boolean = false
+  settings: ComponentSettings
 ) => {
   let payload = {}
 
   // avoid sending ecommerce flattened products list to GA4
   const { client, payload: fullPayload } = event
-  if (ecommerce) {
-    const { products, ...restOfPayload } = fullPayload
+  if (eventType === 'ecommerce') {
+    const { products, ...restOfPayload } = fullPayload.ecommerce
     payload = restOfPayload
   } else {
     payload = fullPayload
@@ -138,7 +138,7 @@ const getFinalURL = (
   settings: ComponentSettings
 ) => {
   const { payload } = event
-  const toolRequest = getToolRequest(event, settings, ecommerce)
+  const toolRequest = getToolRequest(eventType, event, settings)
 
   // toolRequest['ep.debug_mode'] = true
 
@@ -146,29 +146,31 @@ const getFinalURL = (
 
   // ecommerce events
   if (eventType === 'ecommerce') {
+    const ecommerceData = payload.ecommerce
     let prQueryParams
 
     // event name and currency will always be added as non prefixed query params
     const eventName = event.name || ''
     toolRequest.en = EVENTS[eventName] ? EVENTS[eventName] : eventName
-    payload.currency && (toolRequest.cu = payload.currency)
+    ecommerceData.currency && (toolRequest.cu = ecommerceData.currency)
 
     for (const key of Object.keys(PREFIX_PARAMS_MAPPING)) {
       const param = PREFIX_PARAMS_MAPPING[key]
-      const prefix = isNumber(payload[key]) ? 'epn' : 'ep'
-      payload[key] && (toolRequest[`${prefix}.${param}`] = payload[key])
+      const prefix = isNumber(ecommerceData[key]) ? 'epn' : 'ep'
+      ecommerceData[key] &&
+        (toolRequest[`${prefix}.${param}`] = ecommerceData[key])
     }
 
-    if (payload.products) {
+    if (ecommerceData.products) {
       // handle products list
-      for (const [index, product] of (payload.products || []).entries()) {
+      for (const [index, product] of (ecommerceData.products || []).entries()) {
         const item = mapProductToItem(product)
         prQueryParams = buildProductRequest(item)
         toolRequest[`pr${index + 1}`] = prQueryParams
       }
     } else {
       // handle single product data
-      const item = mapProductToItem(payload)
+      const item = mapProductToItem(ecommerceData)
       prQueryParams = buildProductRequest(item)
       if (prQueryParams) toolRequest['pr1'] = prQueryParams
     }
