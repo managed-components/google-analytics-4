@@ -8,10 +8,11 @@
     "lint": "eslint --ext .ts,.js, src",
     "lint:fix": "eslint --ext .ts,.js, src --fix",
     "bundle": "node esbuild.js",
-    "build": "run-s test lint typecheck bundle",
+    "build": "run-s lint typecheck bundle",
     "typecheck": "tsc --project tsconfig.build.json --noEmit",
     "test": "vitest run --globals",
-    "test:dev": "vitest --globals"
+    "test:dev": "vitest --globals",
+    "release": "npm run build && npm version patch && npm publish"
   },
   "repository": {
     "type": "git",
