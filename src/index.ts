@@ -60,7 +60,7 @@ const sendEvent = async (
       let clientJSAudience = ''
       // Call GAv4-Audiences on Google.com
       clientJSAudience += `fetch("${finalAudienceURL}");`
-      clientJSAudience += client.set('_z_ga_audiences', requestBody['cid'], {
+      client.set('_z_ga_audiences', requestBody['cid'], {
         scope: 'infinite',
       })
       // Trigger the DoubleClick with XHR because we need the response text - it holds the local Google domain
