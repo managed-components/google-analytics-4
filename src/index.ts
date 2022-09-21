@@ -59,7 +59,7 @@ const sendEvent = async (
       const finalAudienceURL = baseAudienceURL + audienceParams
       let clientJSAudience = ''
       // Call GAv4-Audiences on Google.com
-      clientJSAudience += `fetch("${finalAudienceURL}");`
+      client.fetch(finalAudienceURL)
       client.set('_z_ga_audiences', requestBody['cid'], {
         scope: 'infinite',
       })
