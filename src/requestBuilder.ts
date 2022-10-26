@@ -24,50 +24,60 @@ const getToolRequest = (
   } else {
     payload = fullPayload
   }
-  client.get('counter')
-    ? client.set('counter', (parseInt(client.get('counter')) + 1).toString())
-    : client.set('counter', '1')
+
+  let eventsCounter = parseInt(client.get('counter'))
+  if (!Number.isInteger(eventsCounter)) eventsCounter = 0
+  eventsCounter++
+  client.set('counter', eventsCounter.toString())
+
   const requestBody: Record<string, unknown> = {
     v: 2,
-    gtm: '2oe5j0', // gtm version hash
+    // gtm: '2oe5j0', // TODO: GTM version hash? not clear if we need this
     tid: settings.tid,
     dl: client.url.href,
     ul: client.language,
     dt: client.title,
-    _p: getRandomInt(),
-    _s: client.get('counter'),
+    _s: eventsCounter,
     ...(settings.hideOriginalIP && {
       _uip: client.ip,
     }),
     ...(client.referer && { dr: client.referer }),
   }
 
-  // Check if this is a new session
-  if (client.get('_ga4s')) {
+  // Session counting
+  let sessionCounter = parseInt(client.get('session_counter'))
+  if (!Number.isInteger(sessionCounter)) {
+    sessionCounter = 0
+  }
+
+  // Create, refresh or renew session id
+  const sessionLength = 30 * 60 * 1000 // By default, GA4 keeps sessions for 30 minutes
+  let currentSessionID = client.get('ga4sid')
+  if (currentSessionID) {
     requestBody['seg'] = 1 // Session engaged
   } else {
     requestBody['seg'] = 0
     requestBody['_ss'] = 1 // Session start
-    client.set('_ga4s', '1', { scope: 'session' })
+    sessionCounter++
+    currentSessionID = getRandomInt().toString()
   }
+  client.set('_ga4sid', currentSessionID, { expiry: sessionLength })
+  requestBody['sid'] = currentSessionID
+  requestBody['_p'] = currentSessionID
 
-  if (client.get('_ga4')) {
-    requestBody['cid'] = client.get('_ga4').split('.').slice(-2).join('.')
-  } else {
-    const uid = crypto.randomUUID()
+  client.set('session_counter', sessionCounter.toString(), {
+    scope: 'infinite',
+  })
+  requestBody['sct'] = sessionCounter
 
-    requestBody['cid'] = uid
-    client.set('_ga4', uid, { scope: 'infinite' })
-    requestBody['_fv'] = 1 // first visit
+  // Handle Client ID
+  let cid = client.get('_ga4')?.split('.').slice(-2).join('.')
+  if (!cid) {
+    cid = crypto.randomUUID()
+    requestBody['_fv'] = 1 // No Client ID -> setting "First Visit"
   }
-
-  requestBody['sid'] = client.get('_ga4sid')
-  if (!requestBody['sid']) {
-    requestBody['sid'] = getRandomInt()
-    client.set('_ga4sid', (requestBody['sid'] as number).toString(), {
-      scope: 'infinite',
-    })
-  }
+  client.set('_ga4', cid, { scope: 'infinite' })
+  requestBody['cid'] = cid
 
   if (parseInt(requestBody['_s'] as string) > 1) {
     const msSinceLastEvent = Date.now() - parseInt(client.get('_let')) // _let = "_lastEventTime"
@@ -151,7 +161,7 @@ const getFinalURL = (
 
     // event name and currency will always be added as non prefixed query params
     const eventName = event.name || ''
-    toolRequest.en = EVENTS[eventName] ? EVENTS[eventName] : eventName
+    toolRequest.en = EVENTS[eventName] || eventName
     ecommerceData.currency && (toolRequest.cu = ecommerceData.currency)
 
     for (const key of Object.keys(PREFIX_PARAMS_MAPPING)) {
