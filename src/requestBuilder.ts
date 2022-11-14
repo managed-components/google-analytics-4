@@ -114,7 +114,7 @@ const getToolRequest = (
     }
   })
 
-  const builtInKeys = ['tid', 'uid', 'en', 'ni']
+  const builtInKeys = ['tid', 'uid', 'en', 'ni', 'conversion']
   const eventData = flattenKeys(payload)
 
   // `up.X`s are User Properties and should stay with this prefix
@@ -127,6 +127,11 @@ const getToolRequest = (
       delete eventData[key]
     }
   }
+
+  if (eventData.conversion) {
+    eventData._c = 1
+  }
+  delete eventData.conversion
 
   const toolRequest = { ...requestBody, ...eventData }
   return toolRequest
