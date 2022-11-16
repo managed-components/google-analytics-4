@@ -97,8 +97,10 @@ const buildProductRequest = (item: { [k: string]: any }) => {
   for (const [id, value] of Object.entries(item)) {
     const result: { [k: string]: string } = {}
     const preppedValue = _prepareStringContent(value)
-    Object.prototype.hasOwnProperty.call(PRODUCT_DETAILS_MAPPING, id) &&
-      (result[PRODUCT_DETAILS_MAPPING[id]] = preppedValue)
+    const productDetailResultKey =
+      Object.prototype.hasOwnProperty.call(PRODUCT_DETAILS_MAPPING, id)
+      ? PRODUCT_DETAILS_MAPPING[id] : id
+    result[productDetailResultKey] = preppedValue
     if (Object.prototype.hasOwnProperty.call(_listMapping, id)) {
       if (!Object.prototype.hasOwnProperty.call(result, _listMapping[id])) {
         result[_listMapping[id]] = preppedValue
