@@ -152,7 +152,7 @@ const getFinalURL = (
 
   // toolRequest['ep.debug_mode'] = true
 
-  toolRequest.en = eventType
+  toolRequest.en = payload.en || eventType
 
   // ecommerce events
   if (eventType === 'ecommerce') {
