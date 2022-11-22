@@ -61,7 +61,7 @@ const getToolRequest = (
     sessionCounter++
     currentSessionID = getRandomInt().toString()
   }
-  client.set('_ga4sid', currentSessionID, { expiry: sessionLength })
+  client.set('ga4sid', currentSessionID, { expiry: sessionLength })
   requestBody['sid'] = currentSessionID
   requestBody['_p'] = currentSessionID
 
@@ -71,33 +71,33 @@ const getToolRequest = (
   requestBody['sct'] = sessionCounter
 
   // Handle Client ID
-  let cid = client.get('_ga4')?.split('.').slice(-2).join('.')
+  let cid = client.get('ga4')?.split('.').slice(-2).join('.')
   if (!cid) {
     cid = crypto.randomUUID()
     requestBody['_fv'] = 1 // No Client ID -> setting "First Visit"
   }
-  client.set('_ga4', cid, { scope: 'infinite' })
+  client.set('ga4', cid, { scope: 'infinite' })
   requestBody['cid'] = cid
 
   if (parseInt(requestBody['_s'] as string) > 1) {
-    const msSinceLastEvent = Date.now() - parseInt(client.get('_let')) // _let = "_lastEventTime"
+    const msSinceLastEvent = Date.now() - parseInt(client.get('let')) // _let = "_lastEventTime"
     requestBody._et = msSinceLastEvent
   }
-  client.set('_let', Date.now().toString())
+  client.set('let', Date.now().toString())
 
   /* Start of gclid treating */
-  if (client.url.searchParams?.get('_gl')) {
+  if (client.url.searchParams?.get('gl')) {
     try {
-      const _gl = client.url.searchParams?.get('_gl') as string
+      const _gl = client.url.searchParams?.get('gl') as string
       const gclaw = atob(_gl.split('*').pop()?.replaceAll('.', '') || '')
-      client.set('_gclaw', gclaw, { scope: 'infinite' })
+      client.set('gclaw', gclaw, { scope: 'infinite' })
       requestBody.gclid = gclaw.split('.').pop()
     } catch (e) {
       console.log('Google Analytics: Error parsing gclaw', e)
     }
   }
-  if (client.get('_gcl_aw')) {
-    requestBody.gclid = client.get('_gcl_aw').split('.').pop()
+  if (client.get('gcl_aw')) {
+    requestBody.gclid = client.get('gcl_aw').split('.').pop()
   }
   if (client.get('gclid')) {
     requestBody.gclid = client.get('gclid')
