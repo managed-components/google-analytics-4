@@ -1,20 +1,6 @@
 import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
 
-export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.addEventListener('event', event =>
-    sendEvent('event', event, settings)
-  )
-
-  manager.addEventListener('pageview', event => {
-    sendEvent('page_view', event, settings)
-  })
-
-  manager.addEventListener('ecommerce', async event =>
-    sendEvent('ecommerce', event, settings)
-  )
-}
-
 const sendEvent = async (
   eventType: string,
   event: MCEvent,
@@ -78,4 +64,47 @@ const sendEvent = async (
       client.fetch(finalDoubleClickURL)
     }
   }
+  client.set('let', Date.now().toString()) // reset the last event time
+}
+
+const onVisibilityChange =
+  (settings: ComponentSettings) => (event: MCEvent) => {
+    const { client, payload } = event
+    if (payload[0].state) {
+      // on page focus
+      const msPaused = Date.now() - parseInt(client.get('engagementPaused'))
+      client.set(
+        'engagementStart',
+        (parseInt(client.get('engagementStart')) - msPaused).toString()
+      )
+    } else {
+      // on pageblur
+      const msSinceLastEvent = Date.now() - parseInt(client.get('let')) // _let = "_lastEventTime"
+      if (msSinceLastEvent > 1000) {
+        sendEvent('user_engagement', event, settings)
+        client.set('engagementPaused', Date.now().toString())
+      }
+    }
+  }
+
+export default async function (manager: Manager, settings: ComponentSettings) {
+  manager.createEventListener('visibilitychange', onVisibilityChange(settings))
+
+  manager.addEventListener('clientcreated', event => {
+    const { client } = event
+    client.attachEvent('visibilitychange')
+  })
+
+  manager.addEventListener('event', event =>
+    sendEvent('event', event, settings)
+  )
+
+  manager.addEventListener('pageview', event => {
+    event.client.set('engagementStart', Date.now().toString())
+    sendEvent('page_view', event, settings)
+  })
+
+  manager.addEventListener('ecommerce', async event =>
+    sendEvent('ecommerce', event, settings)
+  )
 }
