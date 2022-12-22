@@ -5,7 +5,7 @@ import {
   mapProductToItem,
   PREFIX_PARAMS_MAPPING,
 } from './ecommerce'
-import { flattenKeys, isNumber } from './utils'
+import { flattenKeys } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
@@ -170,7 +170,7 @@ const getFinalURL = (
 
     for (const key of Object.keys(PREFIX_PARAMS_MAPPING)) {
       const param = PREFIX_PARAMS_MAPPING[key]
-      const prefix = isNumber(ecommerceData[key]) ? 'epn' : 'ep'
+      const prefix = Number(ecommerceData[key]) ? 'epn' : 'ep'
       ecommerceData[key] &&
         (toolRequest[`${prefix}.${param}`] = ecommerceData[key])
     }
