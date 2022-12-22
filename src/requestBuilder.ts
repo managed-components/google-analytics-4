@@ -153,8 +153,7 @@ const getFinalURL = (
   settings: ComponentSettings
 ) => {
   const { payload } = event
-  const toolRequest = getToolRequest(eventType, event, settings)
-
+  let toolRequest: { [x: string]: any } = {}
   // toolRequest['ep.debug_mode'] = true
 
   toolRequest.en = payload.en || eventType
@@ -190,6 +189,10 @@ const getFinalURL = (
       if (prQueryParams) toolRequest['pr1'] = prQueryParams
     }
   }
+
+  const partialToolRequest = getToolRequest(eventType, event, settings)
+
+  toolRequest = { ...toolRequest, ...partialToolRequest }
 
   const queryParams = new URLSearchParams(toolRequest).toString()
 

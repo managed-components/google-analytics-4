@@ -40,7 +40,7 @@ const PRODUCT_DETAILS: string[] = [
 const PREFIX_PARAMS_MAPPING: { [k: string]: string } = {
   checkout_id: 'transaction_id',
   order_id: 'transaction_id', // used in refund
-  affiliation: 'affiliation',
+  currency: 'currency',
   // the last in the list has priority - total will overwrite price for example
   price: 'value',
   value: 'value',
@@ -52,6 +52,7 @@ const PREFIX_PARAMS_MAPPING: { [k: string]: string } = {
   list_id: 'item_list_id',
   category: 'item_list_name',
   query: 'search_term',
+  affiliation: 'affiliation',
   // promotions
   promotion_id: 'promotion_id',
   name: 'promotion_name',
