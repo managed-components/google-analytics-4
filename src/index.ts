@@ -88,11 +88,11 @@ const onVisibilityChange =
   }
 
 export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.createEventListener('visibilitychange', onVisibilityChange(settings))
+  manager.createEventListener('visibilityChange', onVisibilityChange(settings))
 
   manager.addEventListener('clientcreated', event => {
     const { client } = event
-    client.attachEvent('visibilitychange')
+    client.attachEvent('visibilityChange')
   })
 
   manager.addEventListener('event', event =>
