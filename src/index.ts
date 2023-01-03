@@ -75,7 +75,7 @@ const onVisibilityChange =
       const msPaused = Date.now() - parseInt(client.get('engagementPaused'))
       client.set(
         'engagementStart',
-        (parseInt(client.get('engagementStart')) - msPaused).toString()
+        (parseInt(client.get('engagementStart')) + msPaused).toString()
       )
     } else {
       // on pageblur
