@@ -70,14 +70,14 @@ const sendEvent = async (
 const onVisibilityChange =
   (settings: ComponentSettings) => (event: MCEvent) => {
     const { client, payload } = event
-    if (payload[0].state) {
+    if (payload.visibilityChange[0].state == 'visible') {
       // on page focus
       const msPaused = Date.now() - parseInt(client.get('engagementPaused'))
       client.set(
         'engagementStart',
         (parseInt(client.get('engagementStart')) + msPaused).toString()
       )
-    } else {
+    } else if (payload.visibilityChange[0].state == 'hidden') {
       // on pageblur
       const msSinceLastEvent = Date.now() - parseInt(client.get('let')) // _let = "_lastEventTime"
       if (msSinceLastEvent > 1000) {
