@@ -82,7 +82,7 @@ const getToolRequest = (
 
   const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
   if (notTheFirstSession && client.get('engagementStart')) {
-    const msEngaged = Date.now() - parseInt(client.get('engagementStart'))
+    const msEngaged = Date.now() - parseInt(client.get('engagementStart') || '')
     requestBody._et = msEngaged
   }
 
@@ -98,7 +98,7 @@ const getToolRequest = (
     }
   }
   if (client.get('gcl_aw')) {
-    requestBody.gclid = client.get('gcl_aw').split('.').pop()
+    requestBody.gclid = client.get('gcl_aw')?.split('.').pop()
   }
   if (client.get('gclid')) {
     requestBody.gclid = client.get('gclid')
