@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/managed-components/google-analytics-4#readme",
   "devDependencies": {
-    "@managed-components/types": "^1.0.0",
+    "@managed-components/types": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "all-contributors-cli": "^6.20.0",
     "esbuild": "^0.14.42",

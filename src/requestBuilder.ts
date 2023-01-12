@@ -25,7 +25,7 @@ const getToolRequest = (
     payload = fullPayload
   }
 
-  let eventsCounter = parseInt(client.get('counter'))
+  let eventsCounter = parseInt(client.get('counter') || '')
   if (!Number.isInteger(eventsCounter)) eventsCounter = 0
   eventsCounter++
   client.set('counter', eventsCounter.toString())
@@ -34,6 +34,7 @@ const getToolRequest = (
     v: 2,
     // gtm: '2oe5j0', // TODO: GTM version hash? not clear if we need this
     tid: settings.tid,
+    sr: client.screenWidth + 'x' + client.screenHeight,
     dl: client.url.href,
     ul: client.language,
     dt: client.title,
@@ -45,7 +46,7 @@ const getToolRequest = (
   }
 
   // Session counting
-  let sessionCounter = parseInt(client.get('session_counter'))
+  let sessionCounter = parseInt(client.get('session_counter') || '')
   if (!Number.isInteger(sessionCounter)) {
     sessionCounter = 0
   }

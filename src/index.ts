@@ -72,14 +72,14 @@ const onVisibilityChange =
     const { client, payload } = event
     if (payload.visibilityChange[0].state == 'visible') {
       // on page focus
-      const msPaused = Date.now() - parseInt(client.get('engagementPaused'))
+      const msPaused = Date.now() - parseInt(client.get('engagementPaused') || '')
       client.set(
         'engagementStart',
-        (parseInt(client.get('engagementStart')) + msPaused).toString()
+        (parseInt(client.get('engagementStart') || '') + msPaused).toString()
       )
     } else if (payload.visibilityChange[0].state == 'hidden') {
       // on pageblur
-      const msSinceLastEvent = Date.now() - parseInt(client.get('let')) // _let = "_lastEventTime"
+      const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '') // _let = "_lastEventTime"
       if (msSinceLastEvent > 1000) {
         sendEvent('user_engagement', event, settings)
         client.set('engagementPaused', Date.now().toString())
