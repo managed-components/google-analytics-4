@@ -81,8 +81,9 @@ const getToolRequest = (
   requestBody['cid'] = cid
 
   const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
-  if (notTheFirstSession && client.get('engagementStart')) {
-    const msEngaged = Date.now() - parseInt(client.get('engagementStart') || '')
+  const engagementStart = client.get('engagementStart')
+  if (notTheFirstSession && engagementStart) {
+    const msEngaged = Date.now() - parseInt(engagementStart)
     requestBody._et = msEngaged
   }
 

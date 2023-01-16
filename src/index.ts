@@ -71,15 +71,21 @@ const onVisibilityChange =
   (settings: ComponentSettings) => (event: MCEvent) => {
     const { client, payload } = event
     if (payload.visibilityChange[0].state == 'visible') {
+      const engagementStartCookie = client.get('engagementStart')
+      const engagementPausedCookie = client.get('engagementPaused')
+      const engagementStart = engagementStartCookie
+        ? parseInt(engagementStartCookie)
+        : Date.now()
+      const engagementPaused = engagementPausedCookie
+        ? parseInt(engagementPausedCookie)
+        : Date.now()
+
       // on page focus
-      const msPaused = Date.now() - parseInt(client.get('engagementPaused') || '')
-      client.set(
-        'engagementStart',
-        (parseInt(client.get('engagementStart') || '') + msPaused).toString()
-      )
+      const msPaused = Date.now() - engagementPaused
+      client.set('engagementStart', (engagementStart + msPaused).toString())
     } else if (payload.visibilityChange[0].state == 'hidden') {
       // on pageblur
-      const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '') // _let = "_lastEventTime"
+      const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
       if (msSinceLastEvent > 1000) {
         sendEvent('user_engagement', event, settings)
         client.set('engagementPaused', Date.now().toString())
