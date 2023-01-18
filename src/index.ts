@@ -81,7 +81,8 @@ const onVisibilityChange =
         : Date.now()
 
       // on page focus
-      const msPaused = Date.now() - engagementPaused
+      const msPaused =
+        engagementStart < engagementPaused ? Date.now() - engagementPaused : 0
       client.set('engagementStart', (engagementStart + msPaused).toString())
     } else if (payload.visibilityChange[0].state == 'hidden') {
       // on pageblur
