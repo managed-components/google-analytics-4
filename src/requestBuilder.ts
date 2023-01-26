@@ -21,7 +21,11 @@ const getToolRequest = (
   if (eventType === 'ecommerce') {
     const restOfPayload: Record<string, any> = {}
     for (const key of Object.keys(fullPayload.ecommerce)) {
-      if (key !== 'products' && !PREFIX_PARAMS_MAPPING[key]) {
+      if (
+        key !== 'products' &&
+        key !== 'currency' &&
+        !PREFIX_PARAMS_MAPPING[key]
+      ) {
         restOfPayload[key] = fullPayload.ecommerce[key]
       }
     }
