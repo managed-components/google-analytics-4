@@ -66,30 +66,7 @@ const sendEvent = async (
   settings: ComponentSettings
 ) => {
   const { client } = event
-  const { requestBody } = getFinalURL(eventType, event, settings)
-
-  const baseURL = 'https://www.google-analytics.com/g/collect?'
-
-  const payload: Record<string, any> = {}
-  const queryParams = new URLSearchParams(requestBody)
-  for (const key of Object.keys(requestBody)) {
-    if (key.startsWith('ep') || key.startsWith('pr') || key === 'en') {
-      queryParams.delete(key)
-      payload[key] = requestBody[key]
-    }
-  }
-  const finalURL = baseURL + queryParams
-
-  const body = new URLSearchParams(payload).toString()
-
-  fetch(finalURL, {
-    method: 'POST',
-    headers: {
-      'Content-Length': '' + new TextEncoder().encode(body).length,
-      'User-Agent': event.client.userAgent,
-    },
-    body,
-  })
+  const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
 
   fetch(finalURL, {
     headers: { 'User-Agent': client.userAgent },
