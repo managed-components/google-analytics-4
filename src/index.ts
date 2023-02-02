@@ -97,16 +97,12 @@ const onVisibilityChange =
 export default async function (manager: Manager, settings: ComponentSettings) {
   manager.createEventListener('visibilityChange', onVisibilityChange(settings))
 
-  manager.addEventListener('clientcreated', event => {
-    const { client } = event
-    client.attachEvent('visibilityChange')
-  })
-
   manager.addEventListener('event', event =>
     sendEvent('event', event, settings)
   )
 
   manager.addEventListener('pageview', event => {
+    event.client.attachEvent('visibilityChange')
     event.client.set('engagementStart', Date.now().toString())
     sendEvent('page_view', event, settings)
   })
