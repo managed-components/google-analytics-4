@@ -14,6 +14,7 @@ const EVENTS: { [k: string]: string } = {
   'Payment Info Entered': 'add_payment_info',
   'Order Completed': 'purchase',
   'Order Refunded': 'refund',
+  'Shipping Info Entered': 'add_shipping_info',
 }
 
 const PRODUCT_DETAILS: string[] = [
