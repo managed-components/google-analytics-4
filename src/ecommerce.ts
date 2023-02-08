@@ -59,7 +59,6 @@ const PREFIX_PARAMS_MAPPING: { [k: string]: string } = {
   name: 'promotion_name',
   creative: 'creative_name',
   position: 'location_id',
-  payment_method: 'payment_method',
 }
 
 // ga4 ecommerce mappings
