@@ -41,7 +41,7 @@ const PRODUCT_DETAILS: string[] = [
 const PREFIX_PARAMS_MAPPING: { [k: string]: string } = {
   checkout_id: 'transaction_id',
   order_id: 'transaction_id', // used in refund
-  currency: 'currency',
+  // currency: 'currency', // currency is added by hand, not prefixed
   // the last in the list has priority - total will overwrite price for example
   price: 'value',
   value: 'value',
