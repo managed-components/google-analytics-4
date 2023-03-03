@@ -62,13 +62,14 @@ const sendGaAudiences = (
 
 const sendEvent = async (
   eventType: string,
+  manager: Manager,
   event: MCEvent,
   settings: ComponentSettings
 ) => {
   const { client } = event
   const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
 
-  fetch(finalURL, {
+  manager.fetch(finalURL, {
     headers: { 'User-Agent': client.userAgent },
   })
 
@@ -79,47 +80,47 @@ const sendEvent = async (
   client.set('let', Date.now().toString()) // reset the last event time
 }
 
-const onVisibilityChange =
-  (settings: ComponentSettings) => (event: MCEvent) => {
-    const { client, payload } = event
-    if (payload.visibilityChange[0].state == 'visible') {
-      const engagementStartCookie = client.get('engagementStart')
-      const engagementPausedCookie = client.get('engagementPaused')
-      const engagementStart = engagementStartCookie
-        ? parseInt(engagementStartCookie)
-        : Date.now()
-      const engagementPaused = engagementPausedCookie
-        ? parseInt(engagementPausedCookie)
-        : Date.now()
+export default async function (manager: Manager, settings: ComponentSettings) {
+  const onVisibilityChange =
+    (settings: ComponentSettings) => (event: MCEvent) => {
+      const { client, payload } = event
+      if (payload.visibilityChange[0].state == 'visible') {
+        const engagementStartCookie = client.get('engagementStart')
+        const engagementPausedCookie = client.get('engagementPaused')
+        const engagementStart = engagementStartCookie
+          ? parseInt(engagementStartCookie)
+          : Date.now()
+        const engagementPaused = engagementPausedCookie
+          ? parseInt(engagementPausedCookie)
+          : Date.now()
 
-      // on page focus
-      const msPaused =
-        engagementStart < engagementPaused ? Date.now() - engagementPaused : 0
-      client.set('engagementStart', (engagementStart + msPaused).toString())
-    } else if (payload.visibilityChange[0].state == 'hidden') {
-      // on pageblur
-      const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
-      if (msSinceLastEvent > 1000) {
-        sendEvent('user_engagement', event, settings)
-        client.set('engagementPaused', Date.now().toString())
+        // on page focus
+        const msPaused =
+          engagementStart < engagementPaused ? Date.now() - engagementPaused : 0
+        client.set('engagementStart', (engagementStart + msPaused).toString())
+      } else if (payload.visibilityChange[0].state == 'hidden') {
+        // on pageblur
+        const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
+        if (msSinceLastEvent > 1000) {
+          sendEvent('user_engagement', manager, event, settings)
+          client.set('engagementPaused', Date.now().toString())
+        }
       }
     }
-  }
 
-export default async function (manager: Manager, settings: ComponentSettings) {
   manager.createEventListener('visibilityChange', onVisibilityChange(settings))
 
   manager.addEventListener('event', event =>
-    sendEvent('event', event, settings)
+    sendEvent('event', manager, event, settings)
   )
 
   manager.addEventListener('pageview', event => {
     event.client.attachEvent('visibilityChange')
     event.client.set('engagementStart', Date.now().toString())
-    sendEvent('page_view', event, settings)
+    sendEvent('page_view', manager, event, settings)
   })
 
   manager.addEventListener('ecommerce', async event =>
-    sendEvent('ecommerce', event, settings)
+    sendEvent('ecommerce', manager, event, settings)
   )
 }
