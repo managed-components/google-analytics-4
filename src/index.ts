@@ -60,27 +60,26 @@ const sendGaAudiences = (
   }
 }
 
-const sendEvent = async (
-  eventType: string,
-  manager: Manager,
-  event: MCEvent,
-  settings: ComponentSettings
-) => {
-  const { client } = event
-  const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
+export default async function (manager: Manager, settings: ComponentSettings) {
+  const sendEvent = async (
+    eventType: string,
+    event: MCEvent,
+    settings: ComponentSettings
+  ) => {
+    const { client } = event
+    const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
 
-  manager.fetch(finalURL, {
-    headers: { 'User-Agent': client.userAgent },
-  })
+    manager.fetch(finalURL, {
+      headers: { 'User-Agent': client.userAgent },
+    })
 
-  if (settings['ga-audiences'] || settings['ga-doubleclick']) {
-    sendGaAudiences(event, settings, requestBody)
+    if (settings['ga-audiences'] || settings['ga-doubleclick']) {
+      sendGaAudiences(event, settings, requestBody)
+    }
+
+    client.set('let', Date.now().toString()) // reset the last event time
   }
 
-  client.set('let', Date.now().toString()) // reset the last event time
-}
-
-export default async function (manager: Manager, settings: ComponentSettings) {
   const onVisibilityChange =
     (settings: ComponentSettings) => (event: MCEvent) => {
       const { client, payload } = event
@@ -102,7 +101,7 @@ export default async function (manager: Manager, settings: ComponentSettings) {
         // on pageblur
         const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
         if (msSinceLastEvent > 1000) {
-          sendEvent('user_engagement', manager, event, settings)
+          sendEvent('user_engagement', event, settings)
           client.set('engagementPaused', Date.now().toString())
         }
       }
@@ -111,16 +110,16 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   manager.createEventListener('visibilityChange', onVisibilityChange(settings))
 
   manager.addEventListener('event', event =>
-    sendEvent('event', manager, event, settings)
+    sendEvent('event', event, settings)
   )
 
   manager.addEventListener('pageview', event => {
     event.client.attachEvent('visibilityChange')
     event.client.set('engagementStart', Date.now().toString())
-    sendEvent('page_view', manager, event, settings)
+    sendEvent('page_view', event, settings)
   })
 
   manager.addEventListener('ecommerce', async event =>
-    sendEvent('ecommerce', manager, event, settings)
+    sendEvent('ecommerce', event, settings)
   )
 }
