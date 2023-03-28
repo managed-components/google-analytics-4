@@ -48,7 +48,7 @@ const getToolRequest = (
     ul: client.language,
     dt: client.title,
     _s: eventsCounter,
-    ...(settings.hideOriginalIP && {
+    ...(!settings.hideOriginalIP && {
       _uip: client.ip,
     }),
     ...(client.referer && { dr: client.referer }),
