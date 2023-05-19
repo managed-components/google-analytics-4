@@ -16,24 +16,6 @@ const EVENTS: { [k: string]: string } = {
   'Order Refunded': 'refund',
 }
 
-const PRODUCT_DETAILS: string[] = [
-  'cart_id',
-  'product_id',
-  'sku',
-  'category',
-  'name',
-  'brand',
-  'variant',
-  'price',
-  'quantity',
-  'coupon',
-  'position',
-
-  'affiliation',
-  'discount',
-  'currency',
-]
-
 // list of params that will be prefixed in the request with
 // ep for string values
 // epn for numbers
@@ -117,15 +99,4 @@ const buildProductRequest = (item: { [k: string]: any }) => {
   return resultList.join('~')
 }
 
-// product comes in standard format
-// returns GA4's standard item
-const mapProductToItem = (product: any) => {
-  const eventProductDescription = PRODUCT_DETAILS
-  const item: any = {}
-  for (const prop of eventProductDescription) {
-    product[prop] && (item[prop] = product[prop])
-  }
-  return item
-}
-
-export { EVENTS, mapProductToItem, PREFIX_PARAMS_MAPPING, buildProductRequest }
+export { EVENTS, PREFIX_PARAMS_MAPPING, buildProductRequest }
