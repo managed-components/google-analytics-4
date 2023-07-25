@@ -22,3 +22,4 @@ jobs:
       - run: npm run lint --if-present
       - run: npm run typecheck --if-present
       - run: npm run bundle --if-present
+      - run: npm run test --if-present
