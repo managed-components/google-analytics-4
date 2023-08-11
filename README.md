@@ -62,6 +62,10 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 
 `ni` events are not taken into account when Google Analytics calculates bounces and session duration. [Learn more](https://support.google.com/analytics/answer/1033068?hl=en#NonInteractionEvents)
 
+### Custom Fields
+
+Custom fields can be used to send properties to Google Analytics. To specify user properties, please add the `up.` prefix to your property's name.
+
 ## 📝 License
 
 Licensed under the [Apache License](./LICENSE).
