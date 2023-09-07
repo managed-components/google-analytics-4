@@ -14,7 +14,7 @@ const getToolRequest = (
   event: MCEvent,
   settings: ComponentSettings
 ) => {
-  let payload = {}
+  let payload: MCEvent['payload'] = {}
 
   // avoid sending ecommerce flattened products list to GA4
   const { client, payload: fullPayload } = event
@@ -48,7 +48,7 @@ const getToolRequest = (
     ul: client.language,
     dt: client.title,
     _s: eventsCounter,
-    ...(!settings.hideOriginalIP && {
+    ...(!(payload.hideOriginalIP || settings.hideOriginalIP) && {
       _uip: client.ip,
     }),
     ...(client.referer && { dr: client.referer }),
