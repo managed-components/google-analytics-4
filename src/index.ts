@@ -74,11 +74,7 @@ export default async function (manager: Manager, settings: ComponentSettings) {
       headers: { 'User-Agent': client.userAgent },
     })
 
-    if (
-      settings['ga-audiences'] ||
-      settings['ga-doubleclick'] ||
-      event.payload['ga-audiences']
-    ) {
+    if (settings['ga-audiences'] || event.payload['ga-audiences']) {
       sendGaAudiences(event, settings, requestBody)
     }
 
