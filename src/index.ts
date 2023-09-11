@@ -24,9 +24,10 @@ const sendGaAudiences = (
   const finalDoubleClickURL = baseDoubleClick + doubleClickParams
 
   if (
-    settings['ga-audiences'] &&
-    (!client.get('_z_ga_audiences') ||
-      client.get('_z_ga_audiences') !== requestBody['cid'])
+    settings['ga-audiences'] ||
+    (event.payload['ga-audiences'] &&
+      (!client.get('_z_ga_audiences') ||
+        client.get('_z_ga_audiences') !== requestBody['cid']))
   ) {
     // Build the GAv4 Audiences request
     const audiences = {
@@ -73,7 +74,11 @@ export default async function (manager: Manager, settings: ComponentSettings) {
       headers: { 'User-Agent': client.userAgent },
     })
 
-    if (settings['ga-audiences'] || settings['ga-doubleclick']) {
+    if (
+      settings['ga-audiences'] ||
+      settings['ga-doubleclick'] ||
+      event.payload['ga-audiences']
+    ) {
       sendGaAudiences(event, settings, requestBody)
     }
 
