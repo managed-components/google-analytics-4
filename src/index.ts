@@ -24,10 +24,9 @@ const sendGaAudiences = (
   const finalDoubleClickURL = baseDoubleClick + doubleClickParams
 
   if (
-    settings['ga-audiences'] ||
-    (event.payload['ga-audiences'] &&
-      (!client.get('_z_ga_audiences') ||
-        client.get('_z_ga_audiences') !== requestBody['cid']))
+    (settings['ga-audiences'] || event.payload['ga-audiences']) &&
+    (!client.get('_z_ga_audiences') ||
+      client.get('_z_ga_audiences') !== requestBody['cid'])
   ) {
     // Build the GAv4 Audiences request
     const audiences = {
