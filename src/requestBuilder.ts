@@ -138,7 +138,7 @@ const getToolRequest = (
   const builtInKeys = ['tid', 'uid', 'en', 'ni', 'conversion']
   const eventData = flattenKeys(payload)
 
-  // If the key is a setting key then remove it from the payload that is sent to GA4
+  // Remove setting keys from the payload that is sent to GA4
   delete eventData['hideOriginalIP']
   delete eventData['ga-audiences']
   // `up.X`s are User Properties and should stay with this prefix
