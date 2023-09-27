@@ -11,7 +11,6 @@ describe('getParamSafely works', () => {
       relatedObject?.nonExistantKey,
       relatedValue,
     ])
-    console.log('result', result)
     expect({ ...result }).not.toEqual({})
     expect({ ...result }).toEqual({ someKey: 'abcd' })
   })
@@ -22,7 +21,6 @@ describe('getParamSafely works', () => {
       relatedObject?.href,
       relatedValue,
     ])
-    console.log('result', result)
     expect({ ...result }).not.toEqual({})
     expect({ ...result }).toEqual({ someKey: 'https://example.com' })
   })
@@ -33,7 +31,6 @@ describe('getParamSafely works', () => {
       relatedObject?.something,
       relatedObject.xyz,
     ])
-    console.log('result', result)
     expect({ ...result }).toEqual({})
   })
 })
