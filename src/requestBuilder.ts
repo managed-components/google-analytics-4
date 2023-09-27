@@ -1,4 +1,4 @@
-import { ComponentSettings, MCEvent, Client } from '@managed-components/types'
+import { ComponentSettings, MCEvent } from '@managed-components/types'
 import {
   buildProductRequest,
   EVENTS,
