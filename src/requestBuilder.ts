@@ -9,22 +9,14 @@ import { flattenKeys } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
-const getDRParam = (
-  client: Client,
-  payload: MCEvent['payload']
-): Record<string, string> => {
-  if (payload.dr) return { dr: payload.dr }
-  if (client.referer) return { dr: client.referer }
-  else return {}
-}
-
-const getDLParam = (
-  client: Client,
-  payload: MCEvent['payload']
-): Record<string, string> => {
-  if (payload.dl) return { dl: payload.dl }
-  if (client.url.href) return { dl: client.url.href }
-  else return {}
+const getParamSafely = (
+  paramKey: string,
+  firstParam?: string,
+  secondParam?: string
+) => {
+  if (firstParam) return { [paramKey]: firstParam }
+  if (secondParam) return { [paramKey]: secondParam }
+  return {}
 }
 
 const getToolRequest = (
@@ -68,8 +60,10 @@ const getToolRequest = (
     ...(!(payload.hideOriginalIP || settings.hideOriginalIP) && {
       _uip: client.ip,
     }),
-    ...getDRParam(client, payload),
-    ...getDLParam(client, payload),
+    ...getParamSafely('dr', payload.dr, client.referer),
+    ...getParamSafely('dl', payload.dl, client.url.href),
+    ...(payload.ir && { ir: true }),
+    ...(payload.dbg && { dbg: true }),
   }
 
   // Session counting
@@ -153,7 +147,18 @@ const getToolRequest = (
     }
   })
 
-  const builtInKeys = ['tid', 'uid', 'en', 'ni', 'conversion']
+  // Don't append ep/epn to these keys
+  const builtInKeys = [
+    'tid',
+    'uid',
+    'en',
+    'ni',
+    'conversion',
+    'dr',
+    'dl',
+    'ir',
+    'dbg',
+  ]
   const eventData = flattenKeys(payload)
 
   // Remove setting keys from the payload that is sent to GA4
