@@ -1,4 +1,4 @@
-import { ComponentSettings, MCEvent } from '@managed-components/types'
+import { ComponentSettings, MCEvent, Client } from '@managed-components/types'
 import {
   buildProductRequest,
   EVENTS,
@@ -8,6 +8,24 @@ import {
 import { flattenKeys } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
+
+const getDRParam = (
+  client: Client,
+  payload: MCEvent['payload']
+): Record<string, string> => {
+  if (payload.dr) return { dr: payload.dr }
+  if (client.referer) return { dr: client.referer }
+  else return {}
+}
+
+const getDLParam = (
+  client: Client,
+  payload: MCEvent['payload']
+): Record<string, string> => {
+  if (payload.dl) return { dl: payload.dl }
+  if (client.url.href) return { dl: client.url.href }
+  else return {}
+}
 
 const getToolRequest = (
   eventType: string,
@@ -44,14 +62,14 @@ const getToolRequest = (
     // gtm: '2oe5j0', // TODO: GTM version hash? not clear if we need this
     tid: settings.tid,
     sr: client.screenWidth + 'x' + client.screenHeight,
-    dl: client.url.href,
     ul: client.language,
     dt: client.title,
     _s: eventsCounter,
     ...(!(payload.hideOriginalIP || settings.hideOriginalIP) && {
       _uip: client.ip,
     }),
-    ...(client.referer && { dr: client.referer }),
+    ...getDRParam(client, payload),
+    ...getDLParam(client, payload),
   }
 
   // Session counting
