@@ -5,19 +5,9 @@ import {
   mapProductToItem,
   PREFIX_PARAMS_MAPPING,
 } from './ecommerce'
-import { flattenKeys } from './utils'
+import { flattenKeys, getParamSafely } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
-
-const getParamSafely = (
-  paramKey: string,
-  firstParam?: string,
-  secondParam?: string
-) => {
-  if (firstParam) return { [paramKey]: firstParam }
-  if (secondParam) return { [paramKey]: secondParam }
-  return {}
-}
 
 const getToolRequest = (
   eventType: string,
@@ -60,8 +50,8 @@ const getToolRequest = (
     ...(!(payload.hideOriginalIP || settings.hideOriginalIP) && {
       _uip: client.ip,
     }),
-    ...getParamSafely('dr', payload.dr, client.referer),
-    ...getParamSafely('dl', payload.dl, client.url.href),
+    ...getParamSafely('dr', [payload.dr, client.referer]),
+    ...getParamSafely('dl', [payload.dl, client.url.href]),
     ...(payload.ir && { ir: true }),
     ...(payload.dbg && { dbg: true }),
   }
