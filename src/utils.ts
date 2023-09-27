@@ -32,8 +32,10 @@ export const getParamSafely = (
   paramKey: string,
   paramValuesToUse: Array<string>
 ) => {
-  paramValuesToUse.forEach(param => {
-    if (param) return { [paramKey]: param }
-  })
+  for (const param of paramValuesToUse) {
+    if (param) {
+      return { [paramKey]: param }
+    }
+  }
   return {}
 }
