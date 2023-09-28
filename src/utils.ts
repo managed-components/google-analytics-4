@@ -21,3 +21,21 @@ export const flattenKeys = (obj: { [k: string]: any } = {}, prefix = '') =>
     }
     return acc
   }, {})
+
+/**
+ * @param paramKey - The key that needs to be merged into original object
+ * @param paramValuesToUse - fallback values that `getParamSafely` will try and retrieve
+ * @returns object - The return value of getParamSafely must be spread to merge into another object
+ * @todo add test
+ */
+export const getParamSafely = (
+  paramKey: string,
+  paramValuesToUse: Array<string>
+) => {
+  for (const param of paramValuesToUse) {
+    if (param) {
+      return { [paramKey]: param }
+    }
+  }
+  return {}
+}

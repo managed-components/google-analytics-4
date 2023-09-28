@@ -5,7 +5,7 @@ import {
   mapProductToItem,
   PREFIX_PARAMS_MAPPING,
 } from './ecommerce'
-import { flattenKeys } from './utils'
+import { flattenKeys, getParamSafely } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
@@ -44,14 +44,16 @@ const getToolRequest = (
     // gtm: '2oe5j0', // TODO: GTM version hash? not clear if we need this
     tid: settings.tid,
     sr: client.screenWidth + 'x' + client.screenHeight,
-    dl: client.url.href,
     ul: client.language,
     dt: client.title,
     _s: eventsCounter,
     ...(!(payload.hideOriginalIP || settings.hideOriginalIP) && {
       _uip: client.ip,
     }),
-    ...(client.referer && { dr: client.referer }),
+    ...getParamSafely('dr', [payload.dr, client.referer]),
+    ...getParamSafely('dl', [payload.dl, client.url.href]),
+    ...(payload.ir && { ir: true }),
+    ...(payload.dbg && { dbg: true }),
   }
 
   // Session counting
@@ -135,7 +137,18 @@ const getToolRequest = (
     }
   })
 
-  const builtInKeys = ['tid', 'uid', 'en', 'ni', 'conversion']
+  // Don't append ep/epn to these keys
+  const builtInKeys = [
+    'tid',
+    'uid',
+    'en',
+    'ni',
+    'conversion',
+    'dr',
+    'dl',
+    'ir',
+    'dbg',
+  ]
   const eventData = flattenKeys(payload)
 
   // Remove setting keys from the payload that is sent to GA4
