@@ -2,7 +2,6 @@ import { ComponentSettings, MCEvent } from '@managed-components/types'
 import {
   buildProductRequest,
   EVENTS,
-  mapProductToItem,
   PREFIX_PARAMS_MAPPING,
 } from './ecommerce'
 import { flattenKeys, getParamSafely } from './utils'
@@ -205,14 +204,12 @@ const getFinalURL = (
     if (ecommerceData.products) {
       // handle products list
       for (const [index, product] of (ecommerceData.products || []).entries()) {
-        const item = mapProductToItem(product)
-        prQueryParams = buildProductRequest(item)
+        prQueryParams = buildProductRequest(product)
         toolRequest[`pr${index + 1}`] = prQueryParams
       }
     } else {
       // handle single product data
-      const item = mapProductToItem(ecommerceData)
-      prQueryParams = buildProductRequest(item)
+      prQueryParams = buildProductRequest(ecommerceData)
       if (prQueryParams) toolRequest['pr1'] = prQueryParams
     }
   }
