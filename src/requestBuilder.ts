@@ -221,6 +221,12 @@ const getFinalURL = (
 
   toolRequest = { ...toolRequest, ...partialToolRequest }
 
+  // Presence of `debug_mode` key will still enable debug mode.
+  // Removing the key allows conditionally disabling debug_mode.
+  if (!toolRequest['ep.debug_mode'] || toolRequest['ep.debug_mode'] === 'false') {
+    delete toolRequest['ep.debug_mode']
+  }
+
   const queryParams = new URLSearchParams(toolRequest).toString()
 
   const baseURL = 'https://www.google-analytics.com/g/collect?'
