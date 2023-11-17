@@ -9,17 +9,17 @@ import { flattenKeys, getParamSafely } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
-const getToolRequest = (
+function getToolRequest(
   eventType: string,
   event: MCEvent,
   settings: ComponentSettings
-) => {
+): Record<string, unknown> {
   let payload: MCEvent['payload'] = {}
 
   // avoid sending ecommerce flattened products list to GA4
   const { client, payload: fullPayload } = event
   if (eventType === 'ecommerce') {
-    const restOfPayload: Record<string, any> = {}
+    const restOfPayload: Record<string, unknown> = {}
     for (const key of Object.keys(fullPayload.ecommerce)) {
       if (
         key !== 'products' &&
@@ -180,7 +180,7 @@ const getFinalURL = (
   settings: ComponentSettings
 ) => {
   const { payload } = event
-  let toolRequest: { [x: string]: any } = {}
+  let toolRequest: Record<string, string> = {}
   // toolRequest['ep.debug_mode'] = true
 
   toolRequest.en = payload.en || eventType
@@ -219,7 +219,10 @@ const getFinalURL = (
 
   const partialToolRequest = getToolRequest(eventType, event, settings)
 
-  toolRequest = { ...toolRequest, ...partialToolRequest }
+  toolRequest = {
+    ...toolRequest,
+    ...(partialToolRequest as unknown as Record<string, string>),
+  }
 
   // Presence of `debug_mode` key will still enable debug mode.
   // Removing the key allows conditionally disabling debug_mode.

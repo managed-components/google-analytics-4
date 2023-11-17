@@ -86,7 +86,7 @@ const _listMapping: { [k: string]: string } = {
   creative: 'cn',
 }
 
-const _prepareStringContent = function (value: any) {
+const _prepareStringContent = function (value: unknown) {
   value = String(value)
   return ('' + value).replace(/~/g, function () {
     return '~~'
@@ -95,7 +95,7 @@ const _prepareStringContent = function (value: any) {
 
 // takes a GA4 item and turns it into a query parameter
 // eg: id45790-32~caGames~nmMonopoly: 3rd Edition~pr19~qt1
-const buildProductRequest = (item: { [k: string]: any }) => {
+const buildProductRequest = (item: { [k: string]: unknown }) => {
   const allKeys = {}
   for (const [id, value] of Object.entries(item)) {
     const result: { [k: string]: string } = {}
@@ -120,9 +120,9 @@ const buildProductRequest = (item: { [k: string]: any }) => {
 
 // product comes in standard format
 // returns GA4's standard item
-const mapProductToItem = (product: any) => {
+const mapProductToItem = (product: Record<string, unknown>) => {
   const eventProductDescription = PRODUCT_DETAILS
-  const item: any = {}
+  const item: Record<string, unknown> = {}
   for (const prop of eventProductDescription) {
     product[prop] && (item[prop] = product[prop])
   }
