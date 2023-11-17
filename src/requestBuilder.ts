@@ -223,7 +223,10 @@ const getFinalURL = (
 
   // Presence of `debug_mode` key will still enable debug mode.
   // Removing the key allows conditionally disabling debug_mode.
-  if (!toolRequest['ep.debug_mode'] || toolRequest['ep.debug_mode'] === 'false') {
+  if (
+    !toolRequest['ep.debug_mode'] ||
+    toolRequest['ep.debug_mode'] === 'false'
+  ) {
     delete toolRequest['ep.debug_mode']
   }
 
