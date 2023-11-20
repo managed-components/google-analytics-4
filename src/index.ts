@@ -4,19 +4,23 @@ import { getFinalURL } from './requestBuilder'
 const sendGaAudiences = (
   event: MCEvent,
   settings: ComponentSettings,
-  requestBody: Record<string, any>
+  requestBody: Record<string, unknown>
 ) => {
   const { client } = event
 
   const baseDoubleClick = 'https://stats.g.doubleclick.net/g/collect?'
-  const doubleClick = {
+  const cid = requestBody['cid']
+  if (!cid || typeof cid != 'string') {
+    throw new Error('cid in requestBody should be a string')
+  }
+  const doubleClick: Record<string, string> = {
     t: 'dc',
     aip: '1',
     _r: '3',
     v: '1',
     _v: 'j86',
     tid: settings.tid,
-    cid: requestBody['cid'],
+    cid,
     _u: 'KGDAAEADQAAAAC~',
     z: (+Math.floor(2147483647 * Math.random())).toString(),
   }
@@ -41,7 +45,7 @@ const sendGaAudiences = (
     let clientJSAudience = ''
     // Call GAv4-Audiences on Google.com
     client.fetch(finalAudienceURL)
-    client.set('_z_ga_audiences', requestBody['cid'], {
+    client.set('_z_ga_audiences', cid, {
       scope: 'infinite',
     })
     // Trigger the DoubleClick with XHR because we need the response text - it holds the local Google domain
