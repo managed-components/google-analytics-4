@@ -6,3 +6,4 @@ src
 esbuild.js
 tsconfig.build.json
 tsconfig.json
+coverage
