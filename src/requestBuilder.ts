@@ -91,11 +91,10 @@ function getToolRequest(
   client.set('ga4', cid, { scope: 'infinite' })
   requestBody['cid'] = cid
 
-  const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
-  const engagementStart = client.get('engagementStart')
-  if (notTheFirstSession && engagementStart) {
-    const msEngaged = Date.now() - parseInt(engagementStart)
-    requestBody._et = msEngaged
+  //const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
+  const engagementDuration = client.get('engagementDuration')
+  if (engagementDuration) {
+    requestBody._et = engagementDuration
   }
 
   /* Start of gclid treating */

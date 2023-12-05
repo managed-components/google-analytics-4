@@ -1,6 +1,8 @@
 import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
 
+const SESSION_DURATION_IN_MIN = 30
+
 const sendGaAudiences = (
   event: MCEvent,
   settings: ComponentSettings,
@@ -87,43 +89,78 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   const onVisibilityChange =
     (settings: ComponentSettings) => (event: MCEvent) => {
       const { client, payload } = event
-      if (payload.visibilityChange[0].state == 'visible') {
-        const engagementStartCookie = client.get('engagementStart')
-        const engagementPausedCookie = client.get('engagementPaused')
-        const engagementStart = engagementStartCookie
-          ? parseInt(engagementStartCookie)
-          : Date.now()
-        const engagementPaused = engagementPausedCookie
-          ? parseInt(engagementPausedCookie)
-          : Date.now()
 
-        // on page focus
-        const msPaused =
-          engagementStart < engagementPaused ? Date.now() - engagementPaused : 0
-        client.set('engagementStart', (engagementStart + msPaused).toString())
+      if (payload.visibilityChange[0].state == 'visible') {
+        event.client.set('engagementStart', payload.visibilityChange[0].timestamp)
       } else if (payload.visibilityChange[0].state == 'hidden') {
         // on pageblur
+        computeEngagementDuration(event)
+
         const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
-        if (msSinceLastEvent > 1000) {
+        if (msSinceLastEvent > 10000) {
+          // order matters so engagement duration is set before dispatching the hit
+          computeEngagementDuration(event)
+
           sendEvent('user_engagement', event, settings)
-          client.set('engagementPaused', Date.now().toString())
+
+          // Reset engagementDuration after event has been dispatched so it does not accumulate
+          event.client.set('engagementDuration', '0')
         }
       }
     }
 
+  const computeEngagementDuration = event => {
+    const now = new Date(Date.now()).getTime()
+
+    let engagementDuration =
+      parseInt(event.client.get('engagementDuration')) || 0
+    let engagementStart = parseInt(event.client.get('engagementStart')) || now
+    const delaySinceLast = (now - engagementStart) / 1000 / 60
+
+    // Last interaction occured in a previous session, reset engagementStart
+    if (delaySinceLast > SESSION_DURATION_IN_MIN) {
+      engagementStart = now
+    }
+
+    engagementDuration += now - engagementStart
+
+    event.client.set('engagementDuration', `${engagementDuration}`)
+
+    // engagement start gets reset on every new pageview or event
+    event.client.set('engagementStart', `${now}`)
+  }
+
   manager.createEventListener('visibilityChange', onVisibilityChange(settings))
 
-  manager.addEventListener('event', event =>
+  manager.addEventListener('event', event => {
+    // order matters so engagement duration is set before dispatching the hit
+    computeEngagementDuration(event)
+
     sendEvent('event', event, settings)
-  )
+
+    // Reset engagementDuration after event has been dispatched so it does not accumulate
+    event.client.set('engagementDuration', '0')
+  })
 
   manager.addEventListener('pageview', event => {
     event.client.attachEvent('visibilityChange')
-    event.client.set('engagementStart', Date.now().toString())
+
+    // order matters so engagement duration is set before dispatching the hit
+    computeEngagementDuration(event)
+
     sendEvent('page_view', event, settings)
+
+    // Reset engagementDuration after event has been dispatched so it does not accumulate
+    event.client.set('engagementDuration', '0')
   })
 
-  manager.addEventListener('ecommerce', async event =>
+  manager.addEventListener('ecommerce', async event => {
+    // order matters so engagement duration is set before dispatching the hit
+    computeEngagementDuration(event)
+
     sendEvent('ecommerce', event, settings)
-  )
+
+    // Reset engagementDuration after event has been dispatched so it does not accumulate
+    event.client.set('engagementDuration', '0')
+  })
 }
