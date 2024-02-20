@@ -91,7 +91,10 @@ export default async function (manager: Manager, settings: ComponentSettings) {
       const { client, payload } = event
 
       if (payload.visibilityChange[0].state == 'visible') {
-        event.client.set('engagementStart', payload.visibilityChange[0].timestamp)
+        event.client.set(
+          'engagementStart',
+          payload.visibilityChange[0].timestamp
+        )
       } else if (payload.visibilityChange[0].state == 'hidden') {
         // on pageblur
         computeEngagementDuration(event)
