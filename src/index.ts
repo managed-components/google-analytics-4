@@ -112,12 +112,13 @@ export default async function (manager: Manager, settings: ComponentSettings) {
       }
     }
 
-  const computeEngagementDuration = event => {
+  const computeEngagementDuration = (event: MCEvent) => {
     const now = new Date(Date.now()).getTime()
 
     let engagementDuration =
-      parseInt(event.client.get('engagementDuration')) || 0
-    let engagementStart = parseInt(event.client.get('engagementStart')) || now
+      parseInt(event.client.get('engagementDuration') || '0') || 0
+    let engagementStart =
+      parseInt(event.client.get('engagementStart') || '0') || now
     const delaySinceLast = (now - engagementStart) / 1000 / 60
 
     // Last interaction occured in a previous session, reset engagementStart
