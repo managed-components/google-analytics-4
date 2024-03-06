@@ -148,6 +148,7 @@ function getToolRequest(
     'ir',
     'dbg',
     'gcs',
+    'gcd',
   ]
   const eventData = flattenKeys(payload)
 
