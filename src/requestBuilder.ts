@@ -92,7 +92,7 @@ function getToolRequest(
   requestBody['cid'] = cid
 
   //const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
-  const engagementDuration = client.get('engagementDuration')
+  const engagementDuration = parseInt(String(client.get('engagementDuration')), 10) || 0;
   if (engagementDuration) {
     requestBody._et = engagementDuration
   }
