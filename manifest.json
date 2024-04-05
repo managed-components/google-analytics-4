@@ -18,6 +18,10 @@
     "access_client_kv": {
       "description": "",
       "required": true
+    },
+    "server_network_requests": {
+      "description": "Google Analytics uses serverside network requests to report data",
+      "required": true
     }
   }
 }
