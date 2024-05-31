@@ -65,7 +65,7 @@ function getToolRequest(
     // Determine if the session is engaged to set the 'seg' value
     const pageviewCounter = parseInt(client.get('pageviewCounter') || '0')
     const conversionCounter = parseInt(client.get('conversionCounter') || '0')
-    let engagementDuration = parseInt(client.get('engagementDuration') || '0')
+    const engagementDuration = parseInt(client.get('engagementDuration') || '0')
 
     // Session will be marked engaged if longer than 10 seconds, has at least 1 conversion event, and 2 or more pageviews
     if (

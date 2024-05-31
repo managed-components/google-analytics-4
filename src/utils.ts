@@ -1,4 +1,4 @@
-import { Client, MCEvent } from "@managed-components/types"
+import { Client, MCEvent } from '@managed-components/types'
 
 export const flattenKeys = (obj: { [k: string]: unknown } = {}, prefix = '') =>
   Object.keys(obj).reduce((acc: { [k: string]: unknown }, k) => {
@@ -59,7 +59,7 @@ export const countPageview = (client: Client) => {
 
 // conversion events in session counter
 export const countConversion = (event: MCEvent) => {
-  const {client} = event
+  const { client } = event
   let conversionCounter = parseInt(client.get('conversionCounter') || '0') || 0
   if (conversionCounter === 0 && event.payload.conversion) {
     client.set('conversionCounter', '1', { scope: 'session' })

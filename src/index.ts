@@ -1,5 +1,4 @@
 import {
-  Client,
   ComponentSettings,
   Manager,
   MCEvent,
