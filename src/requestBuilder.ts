@@ -61,14 +61,30 @@ function getToolRequest(
   if (!Number.isInteger(sessionCounter)) {
     sessionCounter = 0
   }
+  if (typeof client !== 'undefined' && client) {
+    // Determine if the session is engaged to set the 'seg' value
+    const pageviewCounter = parseInt(client.get('pageviewCounter') || '0')
+    const conversionCounter = parseInt(client.get('conversionCounter') || '0')
+    let engagementDuration = parseInt(client.get('engagementDuration') || '0')
+
+    // Session will be marked engaged if longer than 10 seconds, has at least 1 conversion event, and 2 or more pageviews
+    if (
+      engagementDuration > 10 &&
+      conversionCounter > 0 &&
+      pageviewCounter > 1
+    ) {
+      requestBody['seg'] = 1 // Session engaged
+    } else {
+      requestBody['seg'] = 0
+    }
+  } else {
+    console.error('Client object is undefined or not initialized')
+  }
 
   // Create, refresh or renew session id
   const sessionLength = 30 * 60 * 1000 // By default, GA4 keeps sessions for 30 minutes
   let currentSessionID = client.get('ga4sid')
-  if (currentSessionID) {
-    requestBody['seg'] = 1 // Session engaged
-  } else {
-    requestBody['seg'] = 0
+  if (!currentSessionID) {
     requestBody['_ss'] = 1 // Session start
     sessionCounter++
     currentSessionID = getRandomInt().toString()
@@ -92,7 +108,8 @@ function getToolRequest(
   requestBody['cid'] = cid
 
   //const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
-  const engagementDuration = parseInt(String(client.get('engagementDuration')), 10) || 0;
+  const engagementDuration =
+    parseInt(String(client.get('engagementDuration')), 10) || 0
   if (engagementDuration) {
     requestBody._et = engagementDuration
   }

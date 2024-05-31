@@ -1,3 +1,5 @@
+import { Client, MCEvent } from "@managed-components/types"
+
 export const flattenKeys = (obj: { [k: string]: unknown } = {}, prefix = '') =>
   Object.keys(obj).reduce((acc: { [k: string]: unknown }, k) => {
     const pre = prefix.length ? `${prefix}.` : ''
@@ -42,4 +44,29 @@ export const getParamSafely = (
     }
   }
   return {}
+}
+// pageviews in session counter
+export const countPageview = (client: Client) => {
+  let pageviewCounter = parseInt(client.get('pageviewCounter') || '0') || 0
+
+  if (pageviewCounter === 0) {
+    client.set('pageviewCounter', '1', { scope: 'session' })
+  } else {
+    pageviewCounter++
+    client.set('pageviewCounter', `${pageviewCounter}`, { scope: 'session' })
+  }
+}
+
+// conversion events in session counter
+export const countConversion = (event: MCEvent) => {
+  const {client} = event
+  let conversionCounter = parseInt(client.get('conversionCounter') || '0') || 0
+  if (conversionCounter === 0 && event.payload.conversion) {
+    client.set('conversionCounter', '1', { scope: 'session' })
+  } else {
+    conversionCounter++
+    client.set('conversionCounter', `${conversionCounter}`, {
+      scope: 'session',
+    })
+  }
 }

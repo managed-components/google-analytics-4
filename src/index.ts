@@ -1,5 +1,11 @@
-import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
+import {
+  Client,
+  ComponentSettings,
+  Manager,
+  MCEvent,
+} from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
+import { countConversion, countPageview } from './utils'
 
 const SESSION_DURATION_IN_MIN = 30
 
@@ -137,6 +143,8 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   manager.createEventListener('visibilityChange', onVisibilityChange(settings))
 
   manager.addEventListener('event', event => {
+    // count conversion events for 'seg' value
+    countConversion(event)
     // order matters so engagement duration is set before dispatching the hit
     computeEngagementDuration(event)
 
@@ -149,7 +157,10 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   manager.addEventListener('pageview', event => {
     event.client.attachEvent('visibilityChange')
 
+    // count pageviews for 'seg' value
+    countPageview(event.client)
     // order matters so engagement duration is set before dispatching the hit
+
     computeEngagementDuration(event)
 
     sendEvent('page_view', event, settings)
@@ -159,6 +170,8 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   })
 
   manager.addEventListener('ecommerce', async event => {
+    // count conversion events for 'seg' value
+    countConversion(event)
     // order matters so engagement duration is set before dispatching the hit
     computeEngagementDuration(event)
 
