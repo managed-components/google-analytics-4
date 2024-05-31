@@ -1,8 +1,4 @@
-import {
-  ComponentSettings,
-  Manager,
-  MCEvent,
-} from '@managed-components/types'
+import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
 import { countConversion, countPageview } from './utils'
 
