@@ -61,7 +61,7 @@ function getToolRequest(
   if (!Number.isInteger(sessionCounter)) {
     sessionCounter = 0
   }
-  if (typeof client !== 'undefined' && client) {
+  if (client) {
     // Determine if the session is engaged to set the 'seg' value
     const pageviewCounter = parseInt(client.get('pageviewCounter') || '0')
     const conversionCounter = parseInt(client.get('conversionCounter') || '0')
