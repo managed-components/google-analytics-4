@@ -69,7 +69,7 @@ function getToolRequest(
 
     // Session will be marked engaged if longer than 10 seconds, has at least 1 conversion event, and 2 or more pageviews
     if (
-      engagementDuration > 10 &&
+      engagementDuration >= 10 &&
       conversionCounter > 0 &&
       pageviewCounter > 1
     ) {
@@ -77,8 +77,6 @@ function getToolRequest(
     } else {
       requestBody['seg'] = 0
     }
-  } else {
-    console.error('Client object is undefined or not initialized')
   }
 
   // Create, refresh or renew session id
