@@ -165,6 +165,7 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   })
 
   manager.addEventListener('ecommerce', async event => {
+    event.payload.conversion = true // set ecommerce events as conversion events
     // count conversion events for 'seg' value
     countConversion(event)
     // order matters so engagement duration is set before dispatching the hit
