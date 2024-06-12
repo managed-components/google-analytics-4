@@ -1,4 +1,5 @@
 import { Client, MCEvent } from '@managed-components/types'
+import { SESSION_DURATION_IN_MIN } from '.'
 
 export const flattenKeys = (obj: { [k: string]: unknown } = {}, prefix = '') =>
   Object.keys(obj).reduce((acc: { [k: string]: unknown }, k) => {
@@ -70,3 +71,26 @@ export const countConversion = (event: MCEvent) => {
     })
   }
 }
+
+export const computeEngagementDuration = (event: MCEvent) => {
+  const now = new Date(Date.now()).getTime()
+
+  let engagementDuration =
+    parseInt(event.client.get('engagementDuration') || '0') || 0
+  let engagementStart =
+    parseInt(event.client.get('engagementStart') || '0') || now
+  const delaySinceLast = (now - engagementStart) / 1000 / 60
+
+  // Last interaction occured in a previous session, reset engagementStart
+  if (delaySinceLast > SESSION_DURATION_IN_MIN) {
+    engagementStart = now
+  }
+
+  engagementDuration += now - engagementStart
+
+  event.client.set('engagementDuration', `${engagementDuration}`)
+
+  // engagement start gets reset on every new pageview or event
+  event.client.set('engagementStart', `${now}`)
+}
+

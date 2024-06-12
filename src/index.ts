@@ -1,8 +1,12 @@
 import { ComponentSettings, Manager, MCEvent } from '@managed-components/types'
 import { getFinalURL } from './requestBuilder'
-import { countConversion, countPageview } from './utils'
+import {
+  computeEngagementDuration,
+  countConversion,
+  countPageview,
+} from './utils'
 
-const SESSION_DURATION_IN_MIN = 30
+export const SESSION_DURATION_IN_MIN = 30
 
 const sendGaAudiences = (
   event: MCEvent,
@@ -66,88 +70,53 @@ const sendGaAudiences = (
     client.fetch(finalDoubleClickURL)
   }
 }
+const sendEvent = async (
+  eventType: string,
+  event: MCEvent,
+  settings: ComponentSettings,
+  manager: Manager
+) => {
+  const { client } = event
+  const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
 
-export default async function (manager: Manager, settings: ComponentSettings) {
-  const sendEvent = async (
-    eventType: string,
-    event: MCEvent,
-    settings: ComponentSettings
-  ) => {
-    const { client } = event
-    const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
+  manager.fetch(finalURL, {
+    headers: { 'User-Agent': client.userAgent },
+  })
 
-    manager.fetch(finalURL, {
-      headers: { 'User-Agent': client.userAgent },
-    })
-
-    if (settings['ga-audiences'] || event.payload['ga-audiences']) {
-      sendGaAudiences(event, settings, requestBody)
-    }
-
-    client.set('let', Date.now().toString()) // reset the last event time
+  if (settings['ga-audiences'] || event.payload['ga-audiences']) {
+    sendGaAudiences(event, settings, requestBody)
   }
 
-  const onVisibilityChange =
-    (settings: ComponentSettings) => (event: MCEvent) => {
-      const { client, payload } = event
+  client.set('let', Date.now().toString()) // reset the last event time
+}
+const onVisibilityChange =
+  (settings: ComponentSettings, manager: Manager) => (event: MCEvent) => {
+    const { client, payload } = event
 
-      if (payload.visibilityChange[0].state == 'visible') {
-        event.client.set(
-          'engagementStart',
-          payload.visibilityChange[0].timestamp
-        )
-      } else if (payload.visibilityChange[0].state == 'hidden') {
-        // on pageblur
+    if (payload.visibilityChange[0].state == 'visible') {
+      event.client.set('engagementStart', payload.visibilityChange[0].timestamp)
+    } else if (payload.visibilityChange[0].state == 'hidden') {
+      // on pageblur
+      computeEngagementDuration(event)
+
+      const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
+      if (msSinceLastEvent > 10000) {
+        // order matters so engagement duration is set before dispatching the hit
         computeEngagementDuration(event)
 
-        const msSinceLastEvent = Date.now() - parseInt(client.get('let') || '0') // _let = "_lastEventTime"
-        if (msSinceLastEvent > 10000) {
-          // order matters so engagement duration is set before dispatching the hit
-          computeEngagementDuration(event)
+        sendEvent('user_engagement', event, settings, manager)
 
-          sendEvent('user_engagement', event, settings)
-
-          // Reset engagementDuration after event has been dispatched so it does not accumulate
-          event.client.set('engagementDuration', '0')
-        }
+        // Reset engagementDuration after event has been dispatched so it does not accumulate
+        event.client.set('engagementDuration', '0')
       }
     }
-
-  const computeEngagementDuration = (event: MCEvent) => {
-    const now = new Date(Date.now()).getTime()
-
-    let engagementDuration =
-      parseInt(event.client.get('engagementDuration') || '0') || 0
-    let engagementStart =
-      parseInt(event.client.get('engagementStart') || '0') || now
-    const delaySinceLast = (now - engagementStart) / 1000 / 60
-
-    // Last interaction occured in a previous session, reset engagementStart
-    if (delaySinceLast > SESSION_DURATION_IN_MIN) {
-      engagementStart = now
-    }
-
-    engagementDuration += now - engagementStart
-
-    event.client.set('engagementDuration', `${engagementDuration}`)
-
-    // engagement start gets reset on every new pageview or event
-    event.client.set('engagementStart', `${now}`)
   }
 
-  manager.createEventListener('visibilityChange', onVisibilityChange(settings))
-
-  manager.addEventListener('event', event => {
-    // count conversion events for 'seg' value
-    countConversion(event)
-    // order matters so engagement duration is set before dispatching the hit
-    computeEngagementDuration(event)
-
-    sendEvent('event', event, settings)
-
-    // Reset engagementDuration after event has been dispatched so it does not accumulate
-    event.client.set('engagementDuration', '0')
-  })
+export default async function (manager: Manager, settings: ComponentSettings) {
+  manager.createEventListener(
+    'visibilityChange',
+    onVisibilityChange(settings, manager)
+  )
 
   manager.addEventListener('pageview', event => {
     event.client.attachEvent('visibilityChange')
@@ -158,7 +127,19 @@ export default async function (manager: Manager, settings: ComponentSettings) {
 
     computeEngagementDuration(event)
 
-    sendEvent('page_view', event, settings)
+    sendEvent('page_view', event, settings, manager)
+
+    // Reset engagementDuration after event has been dispatched so it does not accumulate
+    event.client.set('engagementDuration', '0')
+  })
+
+  manager.addEventListener('event', event => {
+    // count conversion events for 'seg' value
+    countConversion(event)
+    // order matters so engagement duration is set before dispatching the hit
+    computeEngagementDuration(event)
+
+    sendEvent('event', event, settings, manager)
 
     // Reset engagementDuration after event has been dispatched so it does not accumulate
     event.client.set('engagementDuration', '0')
@@ -171,7 +152,7 @@ export default async function (manager: Manager, settings: ComponentSettings) {
     // order matters so engagement duration is set before dispatching the hit
     computeEngagementDuration(event)
 
-    sendEvent('ecommerce', event, settings)
+    sendEvent('ecommerce', event, settings, manager)
 
     // Reset engagementDuration after event has been dispatched so it does not accumulate
     event.client.set('engagementDuration', '0')
