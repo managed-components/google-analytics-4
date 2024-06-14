@@ -1,5 +1,11 @@
-import { Client, MCEvent } from '@managed-components/types'
-import { SESSION_DURATION_IN_MIN } from '.'
+import {
+  Client,
+  ComponentSettings,
+  MCEvent,
+  Manager,
+} from '@managed-components/types'
+import { sendEvent } from '.'
+import { Settings } from 'http2'
 
 export const flattenKeys = (obj: { [k: string]: unknown } = {}, prefix = '') =>
   Object.keys(obj).reduce((acc: { [k: string]: unknown }, k) => {
@@ -72,7 +78,12 @@ export const countConversion = (event: MCEvent) => {
   }
 }
 
-export const computeEngagementDuration = (event: MCEvent) => {
+export const computeEngagementDuration = (
+  event: MCEvent,
+  settings: ComponentSettings
+) => {
+  const SESSION_DURATION_IN_MIN = settings.sessionLength || 30 // inactivity time gap between sessions (in min)
+
   const now = new Date(Date.now()).getTime()
 
   let engagementDuration =
@@ -87,10 +98,15 @@ export const computeEngagementDuration = (event: MCEvent) => {
   }
 
   engagementDuration += now - engagementStart
-
   event.client.set('engagementDuration', `${engagementDuration}`)
-
-  // engagement start gets reset on every new pageview or event
-  event.client.set('engagementStart', `${now}`)
 }
 
+export const sendUserEngagementEvent = (
+  event: MCEvent,
+  settings: Settings,
+  manager: Manager
+) => {
+  computeEngagementDuration(event, settings)
+
+  sendEvent('user_engagement', event, settings, manager)
+}
