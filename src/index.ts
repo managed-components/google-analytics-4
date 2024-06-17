@@ -77,11 +77,7 @@ export const sendEvent = async (
 ) => {
   const { client } = event
   const { finalURL, requestBody } = getFinalURL(eventType, event, settings)
-  console.log(
-    '🚀🚀🚀🚀🚀🚀🚀🚀 final URL is here and send event fires',
-    finalURL
-  )
-  console.log('🚀🚀🚀🚀🚀🚀🚀🚀 also manager.fetch is working: ', manager.fetch)
+
   manager.fetch(finalURL, {
     headers: { 'User-Agent': client.userAgent },
   })
@@ -109,7 +105,6 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   )
 
   manager.addEventListener('pageview', event => {
-    // this line does not trigger visibilityChange after a pagview, it will start triggering events only on the fist change to hidden
     event.client.attachEvent('visibilityChange')
 
     // if engagement duration is >1 send a user_engagement event before pageview, to count the time on previous page properly

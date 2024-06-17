@@ -12,10 +12,8 @@ const getRandomInt = () => Math.floor(2147483647 * Math.random())
 const firstPageEvent = (client: Client) => {
   const countedEvent = client.get('countedEvent')
   if (countedEvent) {
-    console.log('🥑🥑🥑🥑🥑🥑🥑 this is not the first event!')
     return false
   } else {
-    console.log('🥑🥑🥑🥑🥑🥑🥑 this is the FIRST event!')
     return true
   }
 }
@@ -125,22 +123,17 @@ function getToolRequest(
     firstPageEvent(client)
   ) {
     requestBody._et = engagementDuration
-    console.log(
-      '💡💡💡💡💡💡💡💡 event/ecommerce includes _et: ',
-      requestBody._et
-    )
+
     // mark first event to avoid sending _et with upcoming events on that page
     event.client.set('countedEvent', '1', { scope: 'page' })
-    // Reset engagementDuration after event has been dispatched so it does not accumulate
+    // Reset engagementDuration and engagementStart after event has been dispatched so it does not accumulate
     event.client.set('engagementDuration', '0')
+    const now = new Date(Date.now()).getTime()
+    event.client.set('engagementStart', `${now}`)
   } else if (eventType === 'user_engagement') {
     requestBody._et = engagementDuration
     // Reset engagementDuration after event has been dispatched so it does not accumulate
     event.client.set('engagementDuration', '0')
-    console.log(
-      '🐝🐝🐝🐝🐝🐝🐝 user_engagement includes _et: ',
-      requestBody._et
-    )
   }
 
   /* Start of gclid treating */
