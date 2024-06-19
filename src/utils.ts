@@ -84,7 +84,7 @@ export const computeEngagementDuration = (
 ) => {
   const SESSION_DURATION_IN_MIN = settings.sessionLength || 30 // inactivity time gap between sessions (in min)
 
-  const now = new Date(Date.now()).getTime()
+  const now = Date.now()
 
   let engagementDuration =
     parseInt(event.client.get('engagementDuration') || '0') || 0

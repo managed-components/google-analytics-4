@@ -128,7 +128,7 @@ function getToolRequest(
     event.client.set('countedEvent', '1', { scope: 'page' })
     // Reset engagementDuration and engagementStart after event has been dispatched so it does not accumulate
     event.client.set('engagementDuration', '0')
-    const now = new Date(Date.now()).getTime()
+    const now = Date.now()
     event.client.set('engagementStart', `${now}`)
   } else if (eventType === 'user_engagement') {
     requestBody._et = engagementDuration
