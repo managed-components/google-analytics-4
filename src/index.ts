@@ -114,7 +114,7 @@ export default async function (manager: Manager, settings: ComponentSettings) {
       sendUserEngagementEvent(event, settings, manager)
     }
     // engagement start gets reset on every new pageview or event
-    const now = new Date(Date.now()).getTime()
+    const now = Date.now()
     event.client.set('engagementStart', `${now}`)
     // Reset engagementDuration after pageview has been dispatched so it restarts the count
     event.client.set('engagementDuration', '0')
