@@ -45,7 +45,7 @@ function getToolRequest(
     tid: settings.tid,
     sr: client.screenWidth + 'x' + client.screenHeight,
     ul: client.language,
-    dt: client.title,
+    ...getParamSafely('dt', [payload.dt, client.title]),
     _s: eventsCounter,
     ...(!(payload.hideOriginalIP || settings.hideOriginalIP) && {
       _uip: client.ip,
@@ -103,7 +103,7 @@ function getToolRequest(
     requestBody['_fv'] = 1 // No Client ID -> setting "First Visit"
   }
   client.set('ga4', cid, { scope: 'infinite' })
-  requestBody['cid'] = cid
+  requestBody['cid'] = payload.cid || cid
 
   //const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
   const engagementDuration =
@@ -164,6 +164,8 @@ function getToolRequest(
     'dbg',
     'gcs',
     'gcd',
+    'cid',
+    'dt',
   ]
   const eventData = flattenKeys(payload)
 
