@@ -29,7 +29,6 @@ const PRODUCT_DETAILS: string[] = [
   'quantity',
   'coupon',
   'position',
-
   'affiliation',
   'discount',
   'currency',

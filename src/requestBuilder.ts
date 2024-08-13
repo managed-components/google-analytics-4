@@ -19,17 +19,18 @@ function getToolRequest(
   // avoid sending ecommerce flattened products list to GA4
   const { client, payload: fullPayload } = event
   if (eventType === 'ecommerce') {
-    const restOfPayload: Record<string, unknown> = {}
+    const ecommercePayload: Record<string, unknown> = {}
     for (const key of Object.keys(fullPayload.ecommerce)) {
       if (
         key !== 'products' &&
         key !== 'currency' &&
         !PREFIX_PARAMS_MAPPING[key]
       ) {
-        restOfPayload[key] = fullPayload.ecommerce[key]
+        ecommercePayload[key] = fullPayload.ecommerce[key]
       }
     }
-    payload = restOfPayload
+    if (fullPayload.gcd) ecommercePayload.gcd = fullPayload.gcd
+    payload = ecommercePayload
   } else {
     payload = fullPayload
   }
