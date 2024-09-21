@@ -1,4 +1,4 @@
-import { ComponentSettings, MCEvent } from '@managed-components/types'
+import { Client, ComponentSettings, MCEvent } from '@managed-components/types'
 import {
   buildProductRequest,
   EVENTS,
@@ -9,6 +9,14 @@ import { flattenKeys, getParamSafely } from './utils'
 
 const getRandomInt = () => Math.floor(2147483647 * Math.random())
 
+const firstPageEvent = (client: Client) => {
+  const countedEvent = client.get('countedEvent')
+  if (countedEvent) {
+    return false
+  } else {
+    return true
+  }
+}
 function getToolRequest(
   eventType: string,
   event: MCEvent,
@@ -109,8 +117,24 @@ function getToolRequest(
   //const notTheFirstSession = parseInt(requestBody['_s'] as string) > 1
   const engagementDuration =
     parseInt(String(client.get('engagementDuration')), 10) || 0
-  if (engagementDuration) {
+
+  // include _et parameter for engagement time metrics
+  if (
+    (eventType === 'event' || eventType === 'ecommerce') &&
+    firstPageEvent(client)
+  ) {
     requestBody._et = engagementDuration
+
+    // mark first event to avoid sending _et with upcoming events on that page
+    event.client.set('countedEvent', '1', { scope: 'page' })
+    // Reset engagementDuration and engagementStart after event has been dispatched so it does not accumulate
+    event.client.set('engagementDuration', '0')
+    const now = Date.now()
+    event.client.set('engagementStart', `${now}`)
+  } else if (eventType === 'user_engagement') {
+    requestBody._et = engagementDuration
+    // Reset engagementDuration after event has been dispatched so it does not accumulate
+    event.client.set('engagementDuration', '0')
   }
 
   /* Start of gclid treating */
