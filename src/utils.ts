@@ -1,4 +1,11 @@
-import { Client, MCEvent } from '@managed-components/types'
+import {
+  Client,
+  ComponentSettings,
+  MCEvent,
+  Manager,
+} from '@managed-components/types'
+import { sendEvent } from '.'
+import { Settings } from 'http2'
 
 export const flattenKeys = (obj: { [k: string]: unknown } = {}, prefix = '') =>
   Object.keys(obj).reduce((acc: { [k: string]: unknown }, k) => {
@@ -69,4 +76,37 @@ export const countConversion = (event: MCEvent) => {
       scope: 'session',
     })
   }
+}
+
+export const computeEngagementDuration = (
+  event: MCEvent,
+  settings: ComponentSettings
+) => {
+  const SESSION_DURATION_IN_MIN = settings.sessionLength || 30 // inactivity time gap between sessions (in min)
+
+  const now = Date.now()
+
+  let engagementDuration =
+    parseInt(event.client.get('engagementDuration') || '0') || 0
+  let engagementStart =
+    parseInt(event.client.get('engagementStart') || '0') || now
+  const delaySinceLast = (now - engagementStart) / 1000 / 60
+
+  // Last interaction occured in a previous session, reset engagementStart
+  if (delaySinceLast > SESSION_DURATION_IN_MIN) {
+    engagementStart = now
+  }
+
+  engagementDuration += now - engagementStart
+  event.client.set('engagementDuration', `${engagementDuration}`)
+}
+
+export const sendUserEngagementEvent = (
+  event: MCEvent,
+  settings: Settings,
+  manager: Manager
+) => {
+  computeEngagementDuration(event, settings)
+
+  sendEvent('user_engagement', event, settings, manager)
 }
