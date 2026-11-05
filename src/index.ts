@@ -3,13 +3,41 @@ import { getFinalURL } from './requestBuilder'
 import { countConversion, countPageview } from './utils'
 
 const SESSION_DURATION_IN_MIN = 30
+const AUDIENCE_RETRY_INTERVAL = 24 * 60 * 60 * 1000
 
-const sendGaAudiences = (
+const GRANTED_CONSENT_STATES = new Set(['n', 'r', 't', 'v'])
+
+const hasGrantedAdsConsent = (requestBody: Record<string, unknown>) => {
+  const gcd = requestBody['gcd']
+  if (Object.prototype.hasOwnProperty.call(requestBody, 'gcd')) {
+    if (typeof gcd !== 'string') return false
+
+    const consentStates = gcd.match(/^11([a-z])1([a-z])1([a-z])1([a-z])5$/)
+    if (!consentStates) return false
+
+    return [0, 2, 3].every(index =>
+      GRANTED_CONSENT_STATES.has(consentStates[index + 1])
+    )
+  }
+
+  const gcs = requestBody['gcs']
+  if (Object.prototype.hasOwnProperty.call(requestBody, 'gcs')) {
+    if (typeof gcs !== 'string') return false
+
+    return /^G1[01-]{2}$/.test(gcs) && gcs[2] === '1'
+  }
+
+  return true
+}
+
+export const sendGaAudiences = (
   event: MCEvent,
   settings: ComponentSettings,
   requestBody: Record<string, unknown>
 ) => {
   const { client } = event
+
+  if (!hasGrantedAdsConsent(requestBody)) return
 
   const baseDoubleClick = 'https://stats.g.doubleclick.net/g/collect?'
   const cid = requestBody['cid']
@@ -26,6 +54,12 @@ const sendGaAudiences = (
     cid,
     _u: 'KGDAAEADQAAAAC~',
     z: (+Math.floor(2147483647 * Math.random())).toString(),
+    ...(typeof requestBody['gcs'] === 'string' && {
+      gcs: requestBody['gcs'],
+    }),
+    ...(typeof requestBody['gcd'] === 'string' && {
+      gcd: requestBody['gcd'],
+    }),
   }
   const doubleClickParams = new URLSearchParams(doubleClick).toString()
   const finalDoubleClickURL = baseDoubleClick + doubleClickParams
@@ -47,17 +81,17 @@ const sendGaAudiences = (
     const finalAudienceURL = baseAudienceURL + audienceParams
     let clientJSAudience = ''
     // Call GAv4-Audiences on Google.com
-    client.fetch(finalAudienceURL)
-    client.set('_z_ga_audiences', cid, {
-      scope: 'infinite',
-    })
+    // `no-cors`: Google does not return CORS headers, so a credentialed `cors`
+    // request would reach Google but then surface a console error on the page.
+    client.fetch(finalAudienceURL, { credentials: 'include', mode: 'no-cors' })
+    client.set('_z_ga_audiences', cid, { expiry: AUDIENCE_RETRY_INTERVAL })
     // Trigger the DoubleClick with XHR because we need the response text - it holds the local Google domain
     clientJSAudience += `x=new XMLHttpRequest,x.withCredentials=!0,x.open("POST","${finalDoubleClickURL}",!0),x.onreadystatechange=function(){`
     clientJSAudience += `if (4 == x.readyState) {`
     clientJSAudience += `const domain = x.responseText.trim();`
     clientJSAudience += `if (domain.startsWith("1g") && domain.length > 2) {`
     // Trigger the request to the local Google domain too
-    clientJSAudience += `fetch("${finalAudienceURL}".replace("www.google.com", "www.google."+domain.slice(2)));`
+    clientJSAudience += `fetch("${finalAudienceURL}".replace("www.google.com", "www.google."+domain.slice(2)),{credentials:"include",mode:"no-cors"});`
     clientJSAudience += `}}`
     clientJSAudience += `},x.send();`
     client.execute(clientJSAudience)
