@@ -81,7 +81,9 @@ export const sendGaAudiences = (
     const finalAudienceURL = baseAudienceURL + audienceParams
     let clientJSAudience = ''
     // Call GAv4-Audiences on Google.com
-    client.fetch(finalAudienceURL, { credentials: 'include' })
+    // `no-cors`: Google does not return CORS headers, so a credentialed `cors`
+    // request would reach Google but then surface a console error on the page.
+    client.fetch(finalAudienceURL, { credentials: 'include', mode: 'no-cors' })
     client.set('_z_ga_audiences', cid, { expiry: AUDIENCE_RETRY_INTERVAL })
     // Trigger the DoubleClick with XHR because we need the response text - it holds the local Google domain
     clientJSAudience += `x=new XMLHttpRequest,x.withCredentials=!0,x.open("POST","${finalDoubleClickURL}",!0),x.onreadystatechange=function(){`
@@ -89,7 +91,7 @@ export const sendGaAudiences = (
     clientJSAudience += `const domain = x.responseText.trim();`
     clientJSAudience += `if (domain.startsWith("1g") && domain.length > 2) {`
     // Trigger the request to the local Google domain too
-    clientJSAudience += `fetch("${finalAudienceURL}".replace("www.google.com", "www.google."+domain.slice(2)),{credentials:"include"});`
+    clientJSAudience += `fetch("${finalAudienceURL}".replace("www.google.com", "www.google."+domain.slice(2)),{credentials:"include",mode:"no-cors"});`
     clientJSAudience += `}}`
     clientJSAudience += `},x.send();`
     client.execute(clientJSAudience)

@@ -35,10 +35,10 @@ describe('Google Analytics audiences', () => {
     expect(client.fetch).toHaveBeenCalledOnce()
     expect(client.fetch).toHaveBeenCalledWith(
       expect.stringContaining(`gcd=${gcd}`),
-      { credentials: 'include' }
+      { credentials: 'include', mode: 'no-cors' }
     )
     expect(client.execute).toHaveBeenCalledWith(
-      expect.stringContaining('credentials:"include"')
+      expect.stringContaining('credentials:"include",mode:"no-cors"')
     )
     expect(client.set).toHaveBeenCalledWith('_z_ga_audiences', 'client-id', {
       expiry: 86400000,
